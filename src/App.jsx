@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import LandingPage from './components/LandingPage.jsx';
 import OnboardingForm from './components/OnboardingForm.jsx';
 import ResultsDashboard from './components/ResultsDashboard.jsx';
 import LoadingAnalysis from './components/LoadingAnalysis.jsx';
@@ -10,7 +11,8 @@ import './index.css';
 const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
 export default function App() {
-  const [stage, setStage] = useState('onboarding');
+  const [stage, setStage] = useState('landing');
+  const [lang, setLang] = useState('ko');
   const [userProfile, setUserProfile] = useState(null);
   const [aiResult, setAiResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
@@ -35,7 +37,7 @@ export default function App() {
   }
 
   function handleReset() {
-    setStage('onboarding');
+    setStage('landing');
     setUserProfile(null);
     setAiResult(null);
     setErrorMsg('');
@@ -43,7 +45,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ background:'linear-gradient(135deg, #050d1a 0%, #070f1e 50%, #050d1a 100%)' }}>
-      {stage === 'onboarding' && <OnboardingForm onComplete={handleProfileComplete} />}
+      {stage === 'landing'    && <LandingPage onStart={(selectedLang) => { setLang(selectedLang); setStage('onboarding'); }} />}
+      {stage === 'onboarding' && <OnboardingForm onComplete={handleProfileComplete} lang={lang} />}
       {stage === 'loading'    && <LoadingAnalysis />}
       {stage === 'results'    && (
         <ResultsDashboard profile={userProfile} aiResult={aiResult} apiKey={API_KEY} marketData={marketData} onReset={handleReset} />
