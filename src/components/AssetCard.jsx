@@ -142,6 +142,13 @@ export default function AssetCard({ asset, analysis, isTopPick, index }) {
                 <span key={f} className="text-xs px-2 py-0.5 rounded-full bg-slate-800/60 border border-slate-700/40 text-slate-400">{f}</span>
               ))}
             </div>
+            {asset.source?.url && (
+              <a href={asset.source.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 mt-3 text-xs text-slate-500 hover:text-blue-400 transition-colors">
+                <span>🔗</span>
+                <span>{asset.source.label || '공식 출처'}</span>
+              </a>
+            )}
           </div>
         )}
       </div>

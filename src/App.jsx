@@ -6,6 +6,7 @@ import LoadingAnalysis from './components/LoadingAnalysis.jsx';
 import { useClaudeAPI } from './hooks/useClaudeAPI.js';
 import { RWA_ASSETS } from './data/assets.js';
 import { fetchMarketData } from './utils/marketData.js';
+import { filterAssetsByProfile } from './utils/riskScoring.js';
 import './index.css';
 
 const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
@@ -27,7 +28,13 @@ export default function App() {
     setUserProfile(profile);
     setStage('loading');
     try {
-      const result = await analyzeAssets(profile, RWA_ASSETS, API_KEY);
+      const liveAssets = RWA_ASSETS.map(a => {
+        const live = marketData[a.id];
+        return live ? { ...a, apy: { min: live.apy, max: live.apy } } : a;
+      });
+      const filtered = filterAssetsByProfile(liveAssets, profile);
+      const assetsToAnalyze = filtered.length >= 2 ? filtered : liveAssets;
+      const result = await analyzeAssets(profile, assetsToAnalyze, API_KEY);
       setAiResult(result);
       setStage('results');
     } catch (err) {

@@ -11,7 +11,7 @@ const PROFILE_LABELS = {
   preferredChain:'체인', horizon:'기간', liquidityNeed:'유동성', riskPriority:'중점 위험',
 };
 
-function Header({ profile, onReset }) {
+function Header({ onReset }) {
   return (
     <div className="flex items-center gap-3 border-b border-slate-700/50 px-5 py-3.5 sticky top-0 backdrop-blur-sm z-10"
       style={{ background:'rgba(5,13,26,0.95)' }}>
@@ -130,7 +130,7 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
 
   return (
     <div className="min-h-screen" style={{ background:'linear-gradient(135deg, #050d1a 0%, #070f1e 50%, #050d1a 100%)' }}>
-      <Header profile={profile} onReset={onReset} />
+      <Header onReset={onReset} />
 
       <div className="max-w-7xl mx-auto px-5 py-7">
         <ProfileBar profile={profile} />
