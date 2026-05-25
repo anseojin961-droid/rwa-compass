@@ -1,14 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useClaudeAPI } from '../hooks/useClaudeAPI.js';
 
-const SUGGESTED = [
-  'BUIDL과 USDe의 위험 구조 차이는?',
-  'GENIUS Act가 이 상품들에 미치는 영향은?',
-  '델타 중립 전략이란 무엇인가요?',
-  '수익률 대비 위험 비교는?',
-];
-
-export default function AIChat({ userProfile, topAssets, apiKey }) {
+export default function AIChat({ userProfile, topAssets, apiKey, t }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,16 +21,18 @@ export default function AIChat({ userProfile, topAssets, apiKey }) {
       const reply = await chat(next, userProfile, topAssets, apiKey);
       setMessages([...next, { role:'assistant', content:reply }]);
     } catch (e) {
-      setMessages([...next, { role:'assistant', content:`오류: ${e.message}` }]);
+      setMessages([...next, { role:'assistant', content:`${t?.chatError || 'Error'}: ${e.message}` }]);
     } finally { setLoading(false); }
   }
+
+  const suggested = t?.chatSuggestions || [];
 
   return (
     <div className="rounded-2xl border border-slate-700/50 card-glass overflow-hidden">
       <div className="px-4 py-3 border-b border-slate-700/50 flex items-center justify-between">
         <div>
-          <p className="text-white text-sm font-semibold">AI 질문하기</p>
-          <p className="text-slate-500 text-xs mt-0.5">자산 조건·위험 구조를 물어보세요</p>
+          <p className="text-white text-sm font-semibold">{t?.chatTitle || 'Ask AI'}</p>
+          <p className="text-slate-500 text-xs mt-0.5">{t?.chatSubtitle || 'Ask about asset conditions & risk structure'}</p>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -49,9 +44,9 @@ export default function AIChat({ userProfile, topAssets, apiKey }) {
       <div className="h-64 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col justify-center">
-            <p className="text-slate-500 text-sm mb-4">예시 질문</p>
+            <p className="text-slate-500 text-sm mb-4">{t?.chatExamples || 'Example questions'}</p>
             <div className="flex flex-wrap gap-2">
-              {SUGGESTED.map(q => (
+              {suggested.map(q => (
                 <button key={q} onClick={() => send(q)}
                   className="text-[11px] px-3 py-1.5 rounded-lg bg-slate-900/60 border border-slate-700/50 text-slate-400 hover:border-blue-500/40 hover:text-slate-300 transition-colors text-left">
                   {q}
@@ -67,7 +62,7 @@ export default function AIChat({ userProfile, topAssets, apiKey }) {
                 : 'bg-slate-900/60 border border-slate-700/50 text-slate-300 rounded-tl-sm'
             }`}>
               {m.role === 'assistant' && (
-                <span className="text-blue-400 text-[10px] font-semibold uppercase tracking-widest block mb-1.5">🧭 RWA Compass</span>
+                <span className="text-blue-400 text-[10px] font-semibold uppercase tracking-widest block mb-1.5">{t?.chatSender || '🧭 RWA Compass'}</span>
               )}
               <p className="whitespace-pre-wrap">{m.content}</p>
             </div>
@@ -77,7 +72,7 @@ export default function AIChat({ userProfile, topAssets, apiKey }) {
         {loading && (
           <div className="flex justify-start">
             <div className="bg-slate-900/60 border border-slate-700/50 rounded-xl rounded-tl-sm px-4 py-3">
-              <span className="text-blue-400 text-[10px] font-semibold uppercase tracking-widest block mb-2">🧭 RWA Compass</span>
+              <span className="text-blue-400 text-[10px] font-semibold uppercase tracking-widest block mb-2">{t?.chatSender || '🧭 RWA Compass'}</span>
               <div className="flex gap-1.5">
                 {[0,1,2].map(d => (
                   <div key={d} className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce"
@@ -96,7 +91,7 @@ export default function AIChat({ userProfile, topAssets, apiKey }) {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-          placeholder="환매 조건이나 위험 요인을 질문하세요"
+          placeholder={t?.chatPlaceholder || 'Ask about redemption terms or risk factors'}
           disabled={loading}
           className="flex-1 bg-slate-900/60 border border-slate-700/50 rounded-lg px-3 py-2.5 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors disabled:opacity-40"
         />

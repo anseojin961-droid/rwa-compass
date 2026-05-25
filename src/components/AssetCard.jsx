@@ -21,7 +21,7 @@ const TYPE_COLORS = {
   orange: { textColor:'text-orange-400',  bgColor:'bg-orange-400/10',  borderColor:'border-orange-400/30'  },
 };
 
-export default function AssetCard({ asset, analysis, isTopPick, index }) {
+export default function AssetCard({ asset, analysis, isTopPick, index, t }) {
   const [expanded, setExpanded] = useState(false);
 
   const fitKey = analysis?.fitAssessment || analysis?.recommendation || 'REVIEW_CAREFULLY';
@@ -72,14 +72,14 @@ export default function AssetCard({ asset, analysis, isTopPick, index }) {
         {/* Metrics */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
-            { label:'Expected APY', val:apyStr, color:'text-emerald-400', live: asset.isLive },
-            { label:'Min. Investment', val:formatMinInvestment(asset.minInvestment), color:'text-slate-200' },
-            { label:'Lockup', val:asset.lockupDays===0 ? 'None' : `${asset.lockupDays}d`, color:'text-slate-200' },
+            { label: t?.expectedApy || 'Expected APY', val: apyStr, color:'text-emerald-400', live: asset.isLive },
+            { label: t?.minInvestment || 'Min. Investment', val: formatMinInvestment(asset.minInvestment), color:'text-slate-200' },
+            { label: t?.lockup || 'Lockup', val: asset.lockupDays===0 ? (t?.lockupNone || 'None') : `${asset.lockupDays}d`, color:'text-slate-200' },
           ].map(m => (
             <div key={m.label} className="bg-slate-900/60 rounded-xl p-3 border border-slate-800/50 text-center">
               <div className={`font-bold text-lg ${m.color} flex items-center justify-center gap-1`}>
                 {m.val}
-                {m.live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" title="실시간 데이터" />}
+                {m.live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" title="Live data" />}
               </div>
               <div className="text-slate-500 text-xs mt-0.5">{m.label}</div>
             </div>
@@ -113,12 +113,12 @@ export default function AssetCard({ asset, analysis, isTopPick, index }) {
 
         <button onClick={() => setExpanded(!expanded)}
           className="w-full text-center text-slate-500 hover:text-slate-400 text-xs transition-colors py-1 flex items-center justify-center gap-1">
-          {expanded ? '▲ 접기' : '▼ 위험 상세보기'}
+          {expanded ? (t?.collapseBtn || '▲ Collapse') : (t?.expandBtn || '▼ Risk Details')}
         </button>
 
         {expanded && (
           <div className="mt-3 pt-3 border-t border-slate-800/50 animate-fade-in">
-            <p className="text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">위험 분석</p>
+            <p className="text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">{t?.riskAnalysis || 'Risk Analysis'}</p>
             <div className="space-y-2 mb-4">
               {Object.entries(asset.risks).map(([k,v]) => (
                 <RiskScoreBar key={k} score={v}
@@ -127,13 +127,13 @@ export default function AssetCard({ asset, analysis, isTopPick, index }) {
             </div>
             {analysis?.keyRisk && (
               <div className="bg-yellow-500/5 border border-yellow-500/15 rounded-lg p-3 mb-3">
-                <p className="text-yellow-400 text-xs font-medium mb-0.5">핵심 리스크</p>
+                <p className="text-yellow-400 text-xs font-medium mb-0.5">{t?.keyRisk || 'Key Risk'}</p>
                 <p className="text-slate-300 text-xs">{analysis.keyRisk}</p>
               </div>
             )}
             {analysis?.geniusActImpact && (
               <div className="bg-purple-500/5 border border-purple-500/15 rounded-lg p-3 mb-3">
-                <p className="text-purple-400 text-xs font-medium mb-0.5">GENIUS Act 영향</p>
+                <p className="text-purple-400 text-xs font-medium mb-0.5">{t?.geniusAct || 'GENIUS Act Impact'}</p>
                 <p className="text-slate-300 text-xs">{analysis.geniusActImpact}</p>
               </div>
             )}
@@ -146,7 +146,7 @@ export default function AssetCard({ asset, analysis, isTopPick, index }) {
               <a href={asset.source.url} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 mt-3 text-xs text-slate-500 hover:text-blue-400 transition-colors">
                 <span>🔗</span>
-                <span>{asset.source.label || '공식 출처'}</span>
+                <span>{asset.source.label || (t?.source || 'Official Source')}</span>
               </a>
             )}
           </div>

@@ -56,7 +56,7 @@ export default function App() {
       {stage === 'onboarding' && <OnboardingForm onComplete={handleProfileComplete} lang={lang} />}
       {stage === 'loading'    && <LoadingAnalysis />}
       {stage === 'results'    && (
-        <ResultsDashboard profile={userProfile} aiResult={aiResult} apiKey={API_KEY} marketData={marketData} onReset={handleReset} />
+        <ResultsDashboard profile={userProfile} aiResult={aiResult} apiKey={API_KEY} marketData={marketData} lang={lang} onReset={handleReset} />
       )}
       {stage === 'error' && (
         <div className="min-h-screen flex items-center justify-center px-4">
