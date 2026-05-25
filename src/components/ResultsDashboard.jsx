@@ -108,17 +108,23 @@ function Radar_({ assets }) {
   );
 }
 
-export default function ResultsDashboard({ profile, aiResult, apiKey, onReset }) {
+export default function ResultsDashboard({ profile, aiResult, apiKey, marketData = {}, onReset }) {
   const analyses  = useMemo(() => aiResult?.analyses  || [], [aiResult]);
   const topPickIds = useMemo(() => aiResult?.topPicks || [], [aiResult]);
 
-  const sorted = useMemo(() => [...RWA_ASSETS].sort((a,b) => {
+  const enrichedAssets = useMemo(() => RWA_ASSETS.map(a => {
+    const live = marketData[a.id];
+    if (!live) return a;
+    return { ...a, apy: { min: live.apy, max: live.apy }, isLive: true };
+  }), [marketData]);
+
+  const sorted = useMemo(() => [...enrichedAssets].sort((a,b) => {
     const aTop = topPickIds.includes(a.id), bTop = topPickIds.includes(b.id);
     if (aTop && !bTop) return -1;
     if (!aTop && bTop) return 1;
     return (analyses.find(x=>x.id===a.id)?.personalizedRiskScore ?? a.riskScore)
          - (analyses.find(x=>x.id===b.id)?.personalizedRiskScore ?? b.riskScore);
-  }), [analyses, topPickIds]);
+  }), [analyses, topPickIds, enrichedAssets]);
 
   const topAssets = sorted.filter(a => topPickIds.includes(a.id));
 

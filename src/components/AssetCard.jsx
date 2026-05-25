@@ -72,12 +72,15 @@ export default function AssetCard({ asset, analysis, isTopPick, index }) {
         {/* Metrics */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
-            { label:'Expected APY', val:apyStr, color:'text-emerald-400' },
+            { label:'Expected APY', val:apyStr, color:'text-emerald-400', live: asset.isLive },
             { label:'Min. Investment', val:formatMinInvestment(asset.minInvestment), color:'text-slate-200' },
             { label:'Lockup', val:asset.lockupDays===0 ? 'None' : `${asset.lockupDays}d`, color:'text-slate-200' },
           ].map(m => (
             <div key={m.label} className="bg-slate-900/60 rounded-xl p-3 border border-slate-800/50 text-center">
-              <div className={`font-bold text-lg ${m.color}`}>{m.val}</div>
+              <div className={`font-bold text-lg ${m.color} flex items-center justify-center gap-1`}>
+                {m.val}
+                {m.live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" title="실시간 데이터" />}
+              </div>
               <div className="text-slate-500 text-xs mt-0.5">{m.label}</div>
             </div>
           ))}

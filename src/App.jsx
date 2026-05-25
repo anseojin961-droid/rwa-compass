@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import OnboardingForm from './components/OnboardingForm.jsx';
 import ResultsDashboard from './components/ResultsDashboard.jsx';
 import LoadingAnalysis from './components/LoadingAnalysis.jsx';
 import { useClaudeAPI } from './hooks/useClaudeAPI.js';
 import { RWA_ASSETS } from './data/assets.js';
+import { fetchMarketData } from './utils/marketData.js';
 import './index.css';
 
 const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
@@ -13,7 +14,12 @@ export default function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [aiResult, setAiResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [marketData, setMarketData] = useState({});
   const { analyzeAssets } = useClaudeAPI();
+
+  useEffect(() => {
+    fetchMarketData().then(setMarketData).catch(() => {});
+  }, []);
 
   async function handleProfileComplete(profile) {
     setUserProfile(profile);
@@ -40,7 +46,7 @@ export default function App() {
       {stage === 'onboarding' && <OnboardingForm onComplete={handleProfileComplete} />}
       {stage === 'loading'    && <LoadingAnalysis />}
       {stage === 'results'    && (
-        <ResultsDashboard profile={userProfile} aiResult={aiResult} apiKey={API_KEY} onReset={handleReset} />
+        <ResultsDashboard profile={userProfile} aiResult={aiResult} apiKey={API_KEY} marketData={marketData} onReset={handleReset} />
       )}
       {stage === 'error' && (
         <div className="min-h-screen flex items-center justify-center px-4">
