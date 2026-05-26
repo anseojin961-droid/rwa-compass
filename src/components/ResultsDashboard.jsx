@@ -2,12 +2,16 @@ import { useMemo, useState, useCallback } from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
 import AssetCard from './AssetCard.jsx';
 import AIChat from './AIChat.jsx';
+import { Icon, BrandMark } from './Icon.jsx';
 import { DATASET_NOTICE, DATASET_REVIEWED_AT, RWA_ASSETS } from '../data/assets.js';
 import { T } from '../i18n/index.js';
 import { QUESTIONS_I18N } from '../i18n/questions.js';
 import { AMOUNT_MAP } from '../utils/riskScoring.js';
 
-const PROFILE_KEYS = ['experience','investmentAmount','goal','riskTolerance','preferredChain','horizon','liquidityNeed','riskPriority'];
+const PROFILE_KEYS = [
+  'experience', 'investmentAmount', 'goal', 'riskTolerance',
+  'preferredChain', 'horizon', 'liquidityNeed', 'riskPriority',
+];
 
 function getValueLabel(key, value, lang) {
   const questions = QUESTIONS_I18N[lang] || QUESTIONS_I18N.ko;
@@ -15,124 +19,64 @@ function getValueLabel(key, value, lang) {
   return q?.options.find(o => o.value === value)?.label || value;
 }
 
-function Header({ onReset, onShare, t }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleShare = useCallback(async () => {
-    await onShare();
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [onShare]);
-
+function Chrome({ crumb, rightExtra }) {
   return (
-    <div className="flex items-center gap-3 border-b border-slate-700/50 px-5 py-3.5 sticky top-0 backdrop-blur-sm z-10"
-      style={{ background:'rgba(5,13,26,0.95)' }}>
-      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-emerald-600 flex items-center justify-center flex-shrink-0">
-        <span className="text-white text-sm">🧭</span>
-      </div>
-      <span className="text-white text-sm font-semibold gradient-text">RWA Compass</span>
-      <span className="text-slate-600 text-sm">—</span>
-      <span className="text-slate-400 text-sm">{t.reportTitle}</span>
-      <div className="ml-auto flex items-center gap-2">
-        <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-slate-500 text-xs">{t.done}</span>
-        </div>
-        <button onClick={handleShare}
-          className={`text-xs px-3 py-1.5 rounded-lg border transition-all duration-300 flex items-center gap-1.5 ${
-            copied
-              ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10'
-              : 'border-slate-700/50 text-slate-400 hover:border-blue-500/40 hover:text-slate-300'
-          }`}>
-          <span>{copied ? '✓' : '↗'}</span>
-          <span>{copied ? t.shareCopied : t.shareBtn}</span>
-        </button>
-        <button onClick={onReset}
-          className="text-xs px-3 py-1.5 rounded-lg border border-slate-700/50 text-slate-400 hover:border-blue-500/40 hover:text-slate-300 transition-colors">
-          {t.reset}
-        </button>
-      </div>
+    <div className="chrome">
+      <BrandMark size={14} />
+      <span className="crumb">{crumb}</span>
+      {rightExtra && <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>{rightExtra}</div>}
     </div>
   );
 }
 
-function ProfileBar({ profile, lang, t }) {
-  return (
-    <div className="flex flex-wrap gap-2 mb-6">
-      {PROFILE_KEYS.filter(k => profile[k]).map(k => (
-        <div key={k} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/60 border border-slate-700/50">
-          <span className="text-slate-500 text-[11px]">{t.profileLabels[k]}</span>
-          <span className="text-slate-300 text-[11px] font-medium">{getValueLabel(k, profile[k], lang)}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Stats({ analyses, topAssets, t }) {
-  const avgRisk = topAssets.length
-    ? (topAssets.reduce((s,a) => s + (analyses.find(x=>x.id===a.id)?.personalizedRiskScore ?? a.riskScore), 0) / topAssets.length).toFixed(1)
-    : '—';
-  const avgApy = topAssets.length
-    ? ((topAssets.reduce((s,a) => s + (a.apy.min+a.apy.max)/2, 0)) / topAssets.length).toFixed(1)
-    : '—';
-  const regulated = topAssets.filter(a => a.regulatory?.includes('SEC') || a.regulatory?.includes('Registered')).length;
-
-  const items = [
-    { label: t.avgRisk,    val: avgRisk,   unit:'/10',                          color:'text-yellow-400' },
-    { label: t.avgApy,     val: avgApy,    unit:'%',                            color:'text-emerald-400' },
-    { label: t.regulated,  val: regulated, unit:`/${topAssets.length}`,         color:'text-blue-400' },
-  ];
-  return (
-    <div className="grid grid-cols-3 gap-3 mb-6">
-      {items.map(it => (
-        <div key={it.label} className="card-glass rounded-xl px-4 py-3.5">
-          <div className="text-slate-500 text-[11px] mb-1.5">{it.label}</div>
-          <div className={`num text-2xl font-bold ${it.color}`}>
-            {it.val}<span className="text-sm text-slate-500 font-normal ml-0.5">{it.unit}</span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Radar_({ assets, t }) {
+function RadarPanel({ assets, t }) {
   if (!assets.length) return null;
   const axes = t.radarAxes;
   const data = axes.map(s => ({ s, v: 0 }));
   const n = Math.min(assets.length, 3);
-  assets.slice(0,n).forEach(a => {
-    data[0].v += (a.apy.max/15)*10;
+  assets.slice(0, n).forEach(a => {
+    data[0].v += (a.apy.max / 15) * 10;
     data[1].v += 10 - a.riskScore;
-    data[2].v += a.lockupDays===0 ? 10 : Math.max(0, 7-Math.min(a.lockupDays,7))+3;
+    data[2].v += a.lockupDays === 0 ? 10 : Math.max(0, 7 - Math.min(a.lockupDays, 7)) + 3;
     data[3].v += (10 - (a.risks?.regulatory ?? 5));
-    data[4].v += a.minInvestment<=1 ? 10 : a.minInvestment<=5000 ? 7 : 3;
+    data[4].v += a.minInvestment <= 1 ? 10 : a.minInvestment <= 5000 ? 7 : 3;
   });
-  data.forEach(d => { d.v = Math.min(10, d.v/n); });
+  data.forEach(d => { d.v = Math.min(10, d.v / n); });
 
   return (
-    <div className="card-glass rounded-2xl p-4 mb-4">
-      <p className="text-slate-400 text-[11px] font-semibold uppercase tracking-widest mb-3">{t.radarTitle}</p>
-      <ResponsiveContainer width="100%" height={170}>
-        <RadarChart data={data.map(d => ({ subject:d.s, value:d.v }))}>
-          <PolarGrid stroke="rgba(59,130,246,0.15)" />
-          <PolarAngleAxis dataKey="subject" tick={{ fill:'#64748b', fontSize:10 }} />
-          <Radar dataKey="value" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.12} strokeWidth={1.5} />
-          <Tooltip contentStyle={{ background:'rgba(10,22,40,0.95)', border:'1px solid rgba(59,130,246,0.3)', borderRadius:8, fontSize:12, color:'#e2e8f0' }}
-            formatter={v => [v.toFixed(1)+'/10', t.radarTitle]} />
-        </RadarChart>
-      </ResponsiveContainer>
-    </div>
+    <ResponsiveContainer width="100%" height={170}>
+      <RadarChart data={data.map(d => ({ subject: d.s, value: d.v }))}>
+        <PolarGrid stroke="var(--line-1)" />
+        <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--tx-3)', fontSize: 10 }} />
+        <Radar
+          dataKey="value"
+          stroke="var(--ac-bright)"
+          fill="var(--ac-bright)"
+          fillOpacity={0.10}
+          strokeWidth={1.5}
+        />
+        <Tooltip
+          contentStyle={{
+            background: 'var(--bg-1)',
+            border: '1px solid var(--line-1)',
+            borderRadius: 6,
+            fontSize: 12,
+            color: 'var(--tx-1)',
+          }}
+          formatter={v => [v.toFixed(1) + '/10', t.radarTitle]}
+        />
+      </RadarChart>
+    </ResponsiveContainer>
   );
 }
 
 export default function ResultsDashboard({ profile, aiResult, apiKey, marketData = {}, lang = 'ko', onReset }) {
   const t = T[lang] || T.ko;
-  const analyses   = useMemo(() => aiResult?.analyses  || [], [aiResult]);
-  const topPickIds = useMemo(() => aiResult?.topPicks || [], [aiResult]);
+  const [copied, setCopied] = useState(false);
 
-  // Fix 2: 사용자 예산 금액 계산
+  const analyses   = useMemo(() => aiResult?.analyses  || [], [aiResult]);
+  const topPickIds = useMemo(() => aiResult?.topPicks  || [], [aiResult]);
+
   const userBudget = useMemo(() => AMOUNT_MAP[profile?.investmentAmount] ?? Infinity, [profile]);
 
   const enrichedAssets = useMemo(() => RWA_ASSETS.map(a => {
@@ -144,20 +88,27 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
   const sorted = useMemo(() => {
     const withBudget = enrichedAssets.map(a => ({ ...a, _budgetExceeds: userBudget < a.minInvestment }));
     return [...withBudget].sort((a, b) => {
-      // 예산 초과 자산은 맨 뒤로
       if (a._budgetExceeds && !b._budgetExceeds) return 1;
       if (!a._budgetExceeds && b._budgetExceeds) return -1;
       const aTop = topPickIds.includes(a.id), bTop = topPickIds.includes(b.id);
       if (aTop && !bTop) return -1;
       if (!aTop && bTop) return 1;
-      return (analyses.find(x=>x.id===a.id)?.personalizedRiskScore ?? a.riskScore)
-           - (analyses.find(x=>x.id===b.id)?.personalizedRiskScore ?? b.riskScore);
+      return (analyses.find(x => x.id === a.id)?.personalizedRiskScore ?? a.riskScore)
+           - (analyses.find(x => x.id === b.id)?.personalizedRiskScore ?? b.riskScore);
     });
   }, [analyses, topPickIds, enrichedAssets, userBudget]);
 
   const topAssets = sorted.filter(a => topPickIds.includes(a.id));
 
-  // Fix 4: 공유 핸들러
+  // Stat computations (for rep-stats block)
+  const avgRisk = topAssets.length
+    ? (topAssets.reduce((s, a) => s + (analyses.find(x => x.id === a.id)?.personalizedRiskScore ?? a.riskScore), 0) / topAssets.length).toFixed(1)
+    : '—';
+  const avgApy = topAssets.length
+    ? ((topAssets.reduce((s, a) => s + (a.apy.min + a.apy.max) / 2, 0)) / topAssets.length).toFixed(1)
+    : '—';
+  const regulated = topAssets.filter(a => a.regulatory?.includes('SEC') || a.regulatory?.includes('Registered')).length;
+
   const handleShare = useCallback(async () => {
     const topNames = topAssets.map(a => a.name).join(', ') || '—';
     const url = 'https://rwa-compass.vercel.app/';
@@ -166,53 +117,159 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
       try { await navigator.share({ title: 'RWA Compass', text }); return; } catch {}
     }
     await navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }, [topAssets, t]);
 
   return (
-    <div className="min-h-screen" style={{ background:'linear-gradient(135deg, #050d1a 0%, #070f1e 50%, #050d1a 100%)' }}>
-      <Header onReset={onReset} onShare={handleShare} t={t} />
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Chrome
+        crumb="Analysis Report · RC-24.05"
+        rightExtra={
+          <>
+            <button className="btn-ghost" onClick={handleShare}>
+              <Icon name="share" size={13} /> {copied ? t.shareCopied : t.shareBtn}
+            </button>
+            <button className="btn-ghost" onClick={onReset}>
+              <Icon name="refresh" size={13} /> {t.reset}
+            </button>
+          </>
+        }
+      />
 
-      <div className="max-w-7xl mx-auto px-5 py-7">
-        <ProfileBar profile={profile} lang={lang} t={t} />
-
-        {aiResult?.portfolioInsight && (
-          <div className="card-glass rounded-2xl p-5 mb-7 border-blue-500/20">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-blue-400">🤖</span>
-              <p className="text-blue-400 text-[11px] font-semibold uppercase tracking-widest">{t.aiSummary}</p>
+      <div className="rep">
+        {/* ── Left: Profile panel ── */}
+        <div className="rep-left">
+          <div className="side-title" style={{ marginBottom: 14 }}>Your Profile</div>
+          {PROFILE_KEYS.filter(k => profile[k]).map(k => (
+            <div className="rep-profile-block" key={k}>
+              <span className="l">{t.profileLabels[k]}</span>
+              <span className="v">{getValueLabel(k, profile[k], lang)}</span>
             </div>
-            <p className="text-slate-300 text-sm leading-6">{aiResult.portfolioInsight}</p>
-          </div>
-        )}
+          ))}
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2">
-            <Stats analyses={analyses} topAssets={topAssets} t={t} />
-
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-semibold text-sm">{t.assetComparison(RWA_ASSETS.length)}</h2>
-              <span className="text-slate-500 text-xs">{t.asOf} {DATASET_REVIEWED_AT}</span>
+          <div style={{ marginTop: 22 }}>
+            <div className="side-title" style={{ marginBottom: 12 }}>Allocation Suggestion</div>
+            <div className="alloc-bar">
+              <div className="alloc-seg" style={{ width: '60%', background: 'var(--ac)' }} />
+              <div className="alloc-seg" style={{ width: '30%', background: 'var(--ac-soft)' }} />
+              <div className="alloc-seg" style={{ width: '10%', background: 'var(--bg-3)' }} />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {sorted.map((asset, i) => (
-                <AssetCard key={asset.id} asset={asset}
-                  analysis={analyses.find(a => a.id===asset.id)}
-                  isTopPick={topPickIds.includes(asset.id)}
-                  budgetExceeds={asset._budgetExceeds}
-                  index={i} t={t} />
-              ))}
+            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6, fontSize: 11.5 }}>
+              <div className="exec-row">
+                <span className="l" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 8, height: 8, background: 'var(--ac)', borderRadius: 2 }}></span>
+                  Core
+                </span>
+                <span className="v">60%</span>
+              </div>
+              <div className="exec-row">
+                <span className="l" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 8, height: 8, background: 'var(--ac-soft)', borderRadius: 2 }}></span>
+                  Satellite
+                </span>
+                <span className="v">30%</span>
+              </div>
+              <div className="exec-row">
+                <span className="l" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 8, height: 8, background: 'var(--bg-3)', borderRadius: 2 }}></span>
+                  Learn
+                </span>
+                <span className="v">10%</span>
+              </div>
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <Radar_ assets={topAssets} t={t} />
-            <AIChat userProfile={profile} topAssets={topAssets} apiKey={apiKey} t={t} />
           </div>
         </div>
 
-        <div className="mt-10 pt-5 border-t border-slate-800/50">
-          <p className="text-slate-600 text-xs leading-5">{DATASET_NOTICE}</p>
+        {/* ── Middle: Main content ── */}
+        <div className="rep-mid">
+          {aiResult?.portfolioInsight && (
+            <div className="rep-summary">
+              <div className="rep-summary-head">
+                <span className="chip accent"><span className="chip-dot"></span>AI Briefing</span>
+                <span className="who">Claude AI</span>
+                <span style={{
+                  marginLeft: 'auto',
+                  fontFamily: 'var(--f-mono)',
+                  fontSize: 11,
+                  color: 'var(--tx-3)',
+                  letterSpacing: '0.06em',
+                }}>
+                  {DATASET_REVIEWED_AT}
+                </span>
+              </div>
+              <p>{aiResult.portfolioInsight}</p>
+            </div>
+          )}
+
+          <div className="rep-stats">
+            <div className="rep-stat">
+              <div className="l">{t.avgRisk}</div>
+              <div className="v" style={{ color: 'var(--warn)' }}>
+                {avgRisk}<span className="unit">/10</span>
+              </div>
+            </div>
+            <div className="rep-stat">
+              <div className="l">{t.avgApy}</div>
+              <div className="v" style={{ color: 'var(--pos)' }}>
+                {avgApy}<span className="unit">%</span>
+              </div>
+            </div>
+            <div className="rep-stat">
+              <div className="l">{t.regulated}</div>
+              <div className="v">
+                {regulated}<span className="unit">/{topAssets.length}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rep-section-head">
+            <h3><span className="accent-bar"></span>{t.assetComparison(RWA_ASSETS.length)}</h3>
+            <span className="meta">{t.asOf} {DATASET_REVIEWED_AT}</span>
+          </div>
+
+          <div className="asset-grid">
+            {sorted.map((asset, i) => (
+              <AssetCard
+                key={asset.id}
+                asset={asset}
+                analysis={analyses.find(a => a.id === asset.id)}
+                isTopPick={topPickIds.includes(asset.id)}
+                budgetExceeds={asset._budgetExceeds}
+                index={i}
+                t={t}
+              />
+            ))}
+          </div>
+
+          <div style={{ marginTop: 28, paddingTop: 16, borderTop: '1px solid var(--line-2)' }}>
+            <p style={{ fontSize: 11, color: 'var(--tx-3)', lineHeight: 1.6 }}>{DATASET_NOTICE}</p>
+          </div>
+        </div>
+
+        {/* ── Right: Radar + Chat ── */}
+        <div className="rep-right">
+          <div className="panel">
+            <div className="panel-head">
+              <div className="panel-title"><span className="accent-bar"></span>{t.radarTitle}</div>
+              <span className="mono" style={{ fontSize: 10, color: 'var(--tx-3)', letterSpacing: '0.08em' }}>
+                5 AXES
+              </span>
+            </div>
+            <div className="panel-body" style={{ padding: 8 }}>
+              <RadarPanel assets={topAssets} t={t} />
+            </div>
+          </div>
+
+          <div className="panel" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div className="panel-head">
+              <div className="panel-title"><span className="accent-bar"></span>{t.chatTitle}</div>
+              <span className="live-dot" style={{ fontSize: 10 }}>Claude</span>
+            </div>
+            <div className="panel-body" style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
+              <AIChat userProfile={profile} topAssets={topAssets} apiKey={apiKey} t={t} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,168 +1,185 @@
 import { useState } from 'react';
-import { RiskScoreBar, RiskScoreBadge } from './RiskScoreBar.jsx';
-import { formatMinInvestment, getGasLabel } from '../utils/riskScoring.js';
+import { Icon, Spark } from './Icon.jsx';
+import { formatMinInvestment } from '../utils/riskScoring.js';
 
-const FIT_STYLES = {
-  STRONG_MATCH:     { text:'text-emerald-400', bg:'bg-emerald-400/10', border:'border-emerald-400/30', label:'Strong Match' },
-  GOOD_MATCH:       { text:'text-blue-400',    bg:'bg-blue-400/10',    border:'border-blue-400/30',    label:'Good Match'   },
-  REVIEW_CAREFULLY: { text:'text-yellow-400',  bg:'bg-yellow-400/10',  border:'border-yellow-400/30',  label:'Review'       },
-  HIGH_MISMATCH:    { text:'text-red-400',     bg:'bg-red-400/10',     border:'border-red-400/30',     label:'Avoid'        },
-  STRONG_BUY:       { text:'text-emerald-400', bg:'bg-emerald-400/10', border:'border-emerald-400/30', label:'Strong Match' },
-  BUY:              { text:'text-blue-400',    bg:'bg-blue-400/10',    border:'border-blue-400/30',    label:'Good Match'   },
-  HOLD:             { text:'text-yellow-400',  bg:'bg-yellow-400/10',  border:'border-yellow-400/30',  label:'Review'       },
-  AVOID:            { text:'text-red-400',     bg:'bg-red-400/10',     border:'border-red-400/30',     label:'Avoid'        },
+const FIT_LABELS = {
+  STRONG_MATCH:     "Strong Match",
+  GOOD_MATCH:       "Good Match",
+  REVIEW_CAREFULLY: "Review",
+  HIGH_MISMATCH:    "Avoid",
+  STRONG_BUY:       "Strong Match",
+  BUY:              "Good Match",
+  HOLD:             "Review",
+  AVOID:            "Avoid",
 };
 
-const TYPE_COLORS = {
-  blue:   { textColor:'text-blue-400',    bgColor:'bg-blue-400/10',    borderColor:'border-blue-400/30'    },
-  purple: { textColor:'text-purple-400',  bgColor:'bg-purple-400/10',  borderColor:'border-purple-400/30'  },
-  red:    { textColor:'text-red-400',     bgColor:'bg-red-400/10',     borderColor:'border-red-400/30'     },
-  green:  { textColor:'text-emerald-400', bgColor:'bg-emerald-400/10', borderColor:'border-emerald-400/30' },
-  orange: { textColor:'text-orange-400',  bgColor:'bg-orange-400/10',  borderColor:'border-orange-400/30'  },
+const FIT_CHIP_CLASS = {
+  STRONG_MATCH:     "pos",
+  GOOD_MATCH:       "accent",
+  REVIEW_CAREFULLY: "warn",
+  HIGH_MISMATCH:    "neg",
+  STRONG_BUY:       "pos",
+  BUY:              "accent",
+  HOLD:             "warn",
+  AVOID:            "neg",
 };
 
 export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, index, t }) {
   const [expanded, setExpanded] = useState(false);
 
-  const fitKey = analysis?.fitAssessment || analysis?.recommendation || 'REVIEW_CAREFULLY';
-  const recStyle = FIT_STYLES[fitKey] || FIT_STYLES.REVIEW_CAREFULLY;
-  const typeStyle = TYPE_COLORS[asset.typeColor] || TYPE_COLORS.blue;
-  const score = analysis?.personalizedRiskScore ?? asset.riskScore;
-  const apyStr = asset.apy.min === asset.apy.max ? `${asset.apy.min}%` : `${asset.apy.min}–${asset.apy.max}%`;
+  const score    = analysis?.personalizedRiskScore ?? asset.riskScore;
+  const apyStr   = asset.apy.min === asset.apy.max
+    ? `${asset.apy.min}%`
+    : `${asset.apy.min}–${asset.apy.max}%`;
+  const logoText = asset.ticker ? asset.ticker.slice(0, 2).toUpperCase() : asset.name.slice(0, 2).toUpperCase();
+  const riskCls  = score <= 2 ? 'low' : score <= 5 ? 'mid' : 'high';
+
+  const sparkValues = [5, 6, 5, 7, 6, 8, 7, 6, 7, 8].map(v => v + (5 - asset.riskScore) * 0.3);
+
+  const fitKey       = analysis?.fitAssessment || analysis?.recommendation || 'REVIEW_CAREFULLY';
+  const fitLabel     = FIT_LABELS[fitKey]     || 'Review';
+  const fitChipClass = FIT_CHIP_CLASS[fitKey] || 'warn';
 
   return (
-    <div className={`animate-slide-up rounded-2xl border transition-all duration-300 overflow-hidden stagger-${Math.min(index+1,7)} ${
-      budgetExceeds
-        ? 'border-slate-800/60 opacity-60'
-        : isTopPick ? 'border-blue-500/40 hover:border-blue-500/60' : 'border-slate-700/50 hover:border-slate-600/60'
-    } card-glass`}
-      style={isTopPick && !budgetExceeds ? { boxShadow:'0 0 30px rgba(59,130,246,0.1)' } : {}}>
-
+    <div className={`acard${isTopPick && !budgetExceeds ? ' top' : ''}${budgetExceeds ? ' budget-exceeded' : ''}`}>
       {budgetExceeds && (
-        <div className="bg-slate-800/80 border-b border-slate-700/50 px-4 py-2 flex items-center gap-2">
-          <span className="text-slate-500 text-sm">🚫</span>
-          <span className="text-slate-500 text-xs font-semibold tracking-wide uppercase">
-            {t?.budgetExceeds || 'Budget Exceeded'}
-          </span>
-          <span className="text-slate-600 text-xs ml-1">— {t?.budgetExceedsDesc || 'Minimum investment exceeds your budget'}</span>
-        </div>
-      )}
-      {!budgetExceeds && isTopPick && (
-        <div className="bg-gradient-to-r from-blue-600/20 to-emerald-600/20 border-b border-blue-500/20 px-4 py-2">
-          <span className="text-yellow-400 text-sm">⭐</span>
-          <span className="text-blue-300 text-xs font-semibold tracking-wide uppercase ml-1.5">AI Top Pick</span>
+        <div className="acard-budget-banner">
+          🚫 <span>예산 초과 — 최소 투자금 {formatMinInvestment(asset.minInvestment)}</span>
         </div>
       )}
 
-      <div className="p-5">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-2xl flex-shrink-0">
-              {asset.logo}
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-white font-bold text-base">{asset.name}</h3>
-                <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${typeStyle.textColor} ${typeStyle.bgColor} ${typeStyle.borderColor}`}>
-                  {asset.type}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-slate-500 text-xs">{asset.issuer}</span>
-                <span className="text-slate-700">·</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${recStyle.text} ${recStyle.bg} ${recStyle.border}`}>
-                  {recStyle.label}
-                </span>
-              </div>
-            </div>
-          </div>
-          <RiskScoreBadge score={score} />
+      <div className="acard-rib">
+        <div className="acard-rank">
+          <span className="num">#{String(index + 1).padStart(2, '0')}</span>
+          {isTopPick && !budgetExceeds
+            ? <><Icon name="star" size={11} /> AI TOP PICK</>
+            : <>RANKED</>
+          }
         </div>
-
-        {/* Metrics */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          {[
-            { label: t?.expectedApy || 'Expected APY', val: apyStr, color:'text-emerald-400', live: asset.isLive },
-            { label: t?.minInvestment || 'Min. Investment', val: formatMinInvestment(asset.minInvestment), color:'text-slate-200' },
-            { label: t?.lockup || 'Lockup', val: asset.lockupDays===0 ? (t?.lockupNone || 'None') : `${asset.lockupDays}d`, color:'text-slate-200' },
-          ].map(m => (
-            <div key={m.label} className="bg-slate-900/60 rounded-xl p-3 border border-slate-800/50 text-center">
-              <div className={`font-bold text-lg ${m.color} flex items-center justify-center gap-1`}>
-                {m.val}
-                {m.live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" title="Live data" />}
-              </div>
-              <div className="text-slate-500 text-xs mt-0.5">{m.label}</div>
-            </div>
-          ))}
+        <div className={`acard-risk ${riskCls}`}>
+          <span className="pip"></span>
+          Risk · <span className="mono" style={{ marginLeft: 4 }}>{score}/10</span>
         </div>
-
-        {/* AI Reasoning */}
-        {analysis?.reasoning && (
-          <div className="bg-blue-500/5 border border-blue-500/15 rounded-xl p-3 mb-4">
-            <div className="flex items-start gap-2">
-              <span className="text-blue-400 text-sm flex-shrink-0 mt-0.5">🤖</span>
-              <p className="text-slate-300 text-xs leading-relaxed">{analysis.reasoning}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Tags */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          {asset.chains.map(c => (
-            <span key={c} className="text-xs px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-400">
-              {c==='Ethereum'?'🔷':c==='Solana'?'🟣':c==='Base'?'🔵':'⛓️'} {c}
-            </span>
-          ))}
-          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-400">
-            ⛽ {getGasLabel(asset.gasFee)}
-          </span>
-          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-400">
-            {asset.regulatory?.includes('SEC')?'🏛️':'⚖️'} {asset.regulatory}
-          </span>
-        </div>
-
-        <button onClick={() => setExpanded(!expanded)}
-          className="w-full text-center text-slate-500 hover:text-slate-400 text-xs transition-colors py-1 flex items-center justify-center gap-1">
-          {expanded ? (t?.collapseBtn || '▲ Collapse') : (t?.expandBtn || '▼ Risk Details')}
-        </button>
-
-        {expanded && (
-          <div className="mt-3 pt-3 border-t border-slate-800/50 animate-fade-in">
-            <p className="text-slate-500 text-xs font-medium uppercase tracking-wide mb-3">{t?.riskAnalysis || 'Risk Analysis'}</p>
-            <div className="space-y-2 mb-4">
-              {Object.entries(asset.risks).map(([k,v]) => (
-                <RiskScoreBar key={k} score={v}
-                  label={k.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase())} small />
-              ))}
-            </div>
-            {analysis?.keyRisk && (
-              <div className="bg-yellow-500/5 border border-yellow-500/15 rounded-lg p-3 mb-3">
-                <p className="text-yellow-400 text-xs font-medium mb-0.5">{t?.keyRisk || 'Key Risk'}</p>
-                <p className="text-slate-300 text-xs">{analysis.keyRisk}</p>
-              </div>
-            )}
-            {analysis?.geniusActImpact && (
-              <div className="bg-purple-500/5 border border-purple-500/15 rounded-lg p-3 mb-3">
-                <p className="text-purple-400 text-xs font-medium mb-0.5">{t?.geniusAct || 'GENIUS Act Impact'}</p>
-                <p className="text-slate-300 text-xs">{analysis.geniusActImpact}</p>
-              </div>
-            )}
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {asset.features.map(f => (
-                <span key={f} className="text-xs px-2 py-0.5 rounded-full bg-slate-800/60 border border-slate-700/40 text-slate-400">{f}</span>
-              ))}
-            </div>
-            {asset.source?.url && (
-              <a href={asset.source.url} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 mt-3 text-xs text-slate-500 hover:text-blue-400 transition-colors">
-                <span>🔗</span>
-                <span>{asset.source.label || (t?.source || 'Official Source')}</span>
-              </a>
-            )}
-          </div>
-        )}
       </div>
+
+      <div className="acard-body">
+        <div className="acard-name-row">
+          <div className="acard-logo">{logoText}</div>
+          <div style={{ flex: 1 }}>
+            <h3 className="acard-name">{asset.name}</h3>
+            <div className="acard-issuer">{asset.issuer}</div>
+            <div className="acard-tags">
+              <span className="chip">{asset.type}</span>
+              {analysis && (
+                <span className={`chip ${fitChipClass}`}>{fitLabel}</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="acard-metrics">
+          <div className="acard-metric">
+            <div className="l">Expected APY</div>
+            <div className="v pos">{apyStr}</div>
+          </div>
+          <div className="acard-metric">
+            <div className="l">Min. Investment</div>
+            <div className="v">{formatMinInvestment(asset.minInvestment)}</div>
+          </div>
+          <div className="acard-metric">
+            <div className="l">Lockup</div>
+            <div className="v">{asset.lockupDays === 0 ? 'None' : `${asset.lockupDays}d`}</div>
+          </div>
+        </div>
+
+        {analysis?.reasoning && (
+          <div className="acard-note">
+            <span className="lbl">AI Analyst</span>
+            {analysis.reasoning}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {asset.chains.map(c => <span key={c} className="chip">{c}</span>)}
+          <span className="chip">{asset.regulatory}</span>
+        </div>
+      </div>
+
+      <div className="acard-foot">
+        <Spark
+          values={sparkValues}
+          width={90}
+          height={24}
+          color={isTopPick && !budgetExceeds ? 'var(--ac-bright)' : 'var(--tx-2)'}
+        />
+        <span className="acard-cta" onClick={() => setExpanded(!expanded)}>
+          {expanded ? '접기' : '위험 상세 보기'} <Icon name="arrow-right" size={11} />
+        </span>
+      </div>
+
+      {expanded && (
+        <div className="acard-expand">
+          {Object.entries(asset.risks).map(([k, v]) => (
+            <div className="risk-bar-row" key={k}>
+              <span className="risk-bar-label">
+                {k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}
+              </span>
+              <div className="risk-bar-track">
+                <div
+                  className="risk-bar-fill"
+                  style={{
+                    width: `${v * 10}%`,
+                    background: v <= 3 ? 'var(--pos)' : v <= 6 ? 'var(--warn)' : 'var(--neg)',
+                  }}
+                />
+              </div>
+              <span className="risk-bar-val">{v}</span>
+            </div>
+          ))}
+
+          {analysis?.keyRisk && (
+            <div style={{
+              marginTop: 12, padding: '10px 12px',
+              background: 'var(--warn-soft)',
+              border: '1px solid rgba(255,181,71,0.3)',
+              borderRadius: 'var(--r-sm)', fontSize: 12, color: 'var(--tx-2)',
+            }}>
+              <span style={{ color: 'var(--warn)', fontWeight: 600, display: 'block', marginBottom: 4 }}>
+                Key Risk
+              </span>
+              {analysis.keyRisk}
+            </div>
+          )}
+
+          {analysis?.geniusActImpact && (
+            <div style={{
+              marginTop: 8, padding: '10px 12px',
+              background: 'var(--ac-faint)',
+              border: '1px solid rgba(46,141,255,0.2)',
+              borderRadius: 'var(--r-sm)', fontSize: 12, color: 'var(--tx-2)',
+            }}>
+              <span style={{ color: 'var(--ac-bright)', fontWeight: 600, display: 'block', marginBottom: 4 }}>
+                GENIUS Act
+              </span>
+              {analysis.geniusActImpact}
+            </div>
+          )}
+
+          {asset.source?.url && (
+            <a
+              href={asset.source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                marginTop: 10, fontSize: 11, color: 'var(--tx-3)',
+              }}
+            >
+              🔗 {asset.source.label}
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }

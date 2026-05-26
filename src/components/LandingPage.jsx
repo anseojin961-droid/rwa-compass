@@ -1,106 +1,193 @@
 import { useState } from 'react';
+import { Icon, BrandMark, Spark } from './Icon.jsx';
 import { T, LANGS } from '../i18n/index.js';
+
+// ── Static market data ────────────────────────────────────────────────────────
+
+const TICKER_ITEMS = [
+  { sym: 'BUIDL',  val: '$1.00',   chg: '▲ 0.00%',  cls: 'pos' },
+  { sym: 'USDe',   val: '$1.00',   chg: '▲ 0.02%',  cls: 'pos' },
+  { sym: 'USDY',   val: '$1.06',   chg: '▲ 0.11%',  cls: 'pos' },
+  { sym: 'OUSG',   val: '$106.84', chg: '▲ 0.08%',  cls: 'pos' },
+  { sym: 'stUSDT', val: '$1.00',   chg: '▲ 0.01%',  cls: 'pos' },
+  { sym: 'TBY',    val: '$100.23', chg: '▼ 0.03%',  cls: 'neg' },
+  { sym: 'ONDO',   val: '$1.27',   chg: '▲ 2.14%',  cls: 'pos' },
+];
+
+const KPIS = [
+  { lbl: 'RWA TVL',     val: '$12.84', unit: 'B', chg: '▲ 1.74% · 24h',  cls: 'pos' },
+  { lbl: 'Active Protocols', val: '127',    unit: '',  chg: '▲ 3 · 7d',       cls: 'pos' },
+  { lbl: 'Avg APY',     val: '8.34',  unit: '%', chg: '▼ 0.22% · 7d',   cls: 'neg' },
+  { lbl: 'Tokenized T-Bills', val: '$4.21', unit: 'B', chg: '▲ 5.30% · 30d', cls: 'pos' },
+];
+
+const ASSETS = [
+  { sym: 'BUIDL', nm: 'BlackRock USD',   apy: '5.12%', spk: [5.0, 5.05, 5.08, 5.10, 5.09, 5.12, 5.12] },
+  { sym: 'USDe',  nm: 'Ethena Synth',    apy: '9.50%', spk: [8.2, 9.1, 9.8, 10.2, 9.6, 9.3, 9.5] },
+  { sym: 'USDY',  nm: 'Ondo US Yield',   apy: '5.30%', spk: [5.1, 5.2, 5.25, 5.30, 5.28, 5.31, 5.30] },
+  { sym: 'OUSG',  nm: 'Ondo Short-Term', apy: '5.07%', spk: [4.9, 4.95, 5.0, 5.05, 5.07, 5.06, 5.07] },
+  { sym: 'stUSDT',nm: 'Tron Yield',      apy: '4.80%', spk: [4.5, 4.6, 4.7, 4.75, 4.80, 4.78, 4.80] },
+  { sym: 'TBY',   nm: 'Bloom T-Bill',    apy: '5.15%', spk: [5.0, 5.1, 5.12, 5.14, 5.15, 5.13, 5.15] },
+  { sym: 'ONDO',  nm: 'Ondo Finance',    apy: '6.80%', spk: [6.0, 6.3, 6.5, 6.7, 6.75, 6.8, 6.8] },
+];
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function Chrome({ lang, setLang }) {
+  return (
+    <div className="chrome">
+      <div className="chrome-left">
+        <div className="brand">
+          <div className="brand-mark"><BrandMark size={14} /></div>
+          <div className="brand-name">RWA <span className="accent">COMPASS</span></div>
+        </div>
+      </div>
+      <div className="chrome-right">
+        <span className="live-dot">Live · DeFiLlama</span>
+        <div className="lang-switch">
+          {LANGS.map(l => (
+            <button
+              key={l.code}
+              className={lang === l.code ? 'on' : ''}
+              onClick={() => setLang(l.code)}
+            >
+              {l.flag} {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TickerBar() {
+  return (
+    <div className="ticker-bar">
+      <div className="ticker-track">
+        {[...TICKER_ITEMS, ...TICKER_ITEMS].map((t, i) => (
+          <span className="tick" key={i}>
+            <span className="sym">{t.sym}</span>
+            <span className="val">{t.val}</span>
+            <span className={`chg ${t.cls}`}>{t.chg}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Feature definitions (icon-mapped) ────────────────────────────────────────
+
+const FEATURES = [
+  { glyph: 'cpu',      tag: '01 · Engine',  titleKey: 0, descKey: 0 },
+  { glyph: 'satellite',tag: '02 · Data',    titleKey: 1, descKey: 1 },
+  { glyph: 'shield',   tag: '03 · Risk',    titleKey: 2, descKey: 2 },
+];
+
+// ── Main component ────────────────────────────────────────────────────────────
 
 export default function LandingPage({ onStart }) {
   const [lang, setLang] = useState('ko');
   const t = T[lang];
 
   return (
-    <div className="min-h-screen flex flex-col"
-      style={{ background: 'linear-gradient(135deg, #050d1a 0%, #070f1e 50%, #050d1a 100%)' }}>
+    <>
+      <Chrome lang={lang} setLang={setLang} />
+      <TickerBar />
+      <div className="landing">
+        {/* ── Left: main content ─────────────────────────────────────────── */}
+        <div className="landing-main">
+          <span className="landing-eyebrow">
+            <span className="dot"></span>
+            AI-Powered RWA Navigator · v2.4
+          </span>
 
-      {/* Ambient blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-60 -left-60 w-[500px] h-[500px] rounded-full opacity-5"
-          style={{ background: 'radial-gradient(circle, #3b82f6, transparent)' }} />
-        <div className="absolute -bottom-60 -right-60 w-[600px] h-[600px] rounded-full opacity-5"
-          style={{ background: 'radial-gradient(circle, #10b981, transparent)' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-3"
-          style={{ background: 'radial-gradient(circle, #1e40af, transparent)' }} />
-      </div>
+          <h1>
+            {t.heroTitle1}
+            <br />
+            <span className="ac-line">{t.heroTitle2}</span>
+          </h1>
 
-      {/* Navbar */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-slate-800/50">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🧭</span>
-          <span className="font-bold text-white text-lg gradient-text">RWA Compass</span>
-        </div>
+          <p className="landing-sub">{t.heroDesc}</p>
 
-        {/* Language switcher */}
-        <div className="flex items-center gap-1 bg-slate-900/60 border border-slate-700/50 rounded-xl p-1">
-          {LANGS.map(l => (
-            <button key={l.code} onClick={() => setLang(l.code)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                lang === l.code
-                  ? 'bg-gradient-to-r from-blue-600/80 to-emerald-600/80 text-white'
-                  : 'text-slate-400 hover:text-slate-300'
-              }`}>
-              <span>{l.flag}</span>
-              <span>{l.label}</span>
+          <div className="feature-row">
+            {FEATURES.map((f, i) => (
+              <div className="feature" key={i}>
+                <div className="feature-head">
+                  <div className="feature-glyph">
+                    <Icon name={f.glyph} size={18} />
+                  </div>
+                  <span className="feature-tag">{f.tag}</span>
+                </div>
+                <h3>{t.features[i].title}</h3>
+                <p>{t.features[i].desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="cta-row">
+            <button className="btn-primary btn-lg" onClick={() => onStart(lang)}>
+              {t.cta} <Icon name="arrow-right" size={16} />
             </button>
-          ))}
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
-
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-          {t.badge}
-        </div>
-
-        {/* Title */}
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-3 leading-tight max-w-3xl">
-          {t.heroTitle1}
-        </h1>
-        <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight max-w-3xl gradient-text">
-          {t.heroTitle2}
-        </h1>
-
-        {/* Description */}
-        <p className="text-slate-400 text-base md:text-lg max-w-xl mx-auto mb-12 leading-relaxed whitespace-pre-line">
-          {t.heroDesc}
-        </p>
-
-        {/* Feature cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl w-full mb-14">
-          {t.features.map((f, i) => (
-            <div key={i} className="card-glass rounded-2xl p-5 text-left hover:border-blue-500/30 transition-all duration-300">
-              <div className="text-2xl mb-3">{f.icon}</div>
-              <h3 className="text-white font-semibold text-sm mb-1.5">{f.title}</h3>
-              <p className="text-slate-500 text-xs leading-relaxed">{f.desc}</p>
+            <div className="cta-meta">
+              <span className="pip">무료</span>
+              <span className="pip">3분 소요</span>
+              <span className="pip">가입 불필요</span>
             </div>
-          ))}
+          </div>
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-8 mb-12">
-          {[
-            { val: t.statsAssets,    sub: t.statsAssetsSub },
-            { val: t.statsQuestions, sub: t.statsQuestionsSub },
-            { val: t.statsAI,        sub: t.statsAISub },
-          ].map((s, i) => (
-            <div key={i} className="text-center">
-              <div className="text-white font-bold text-lg gradient-text">{s.val}</div>
-              <div className="text-slate-500 text-xs mt-0.5">{s.sub}</div>
+        {/* ── Right: data panel ──────────────────────────────────────────── */}
+        <div className="landing-side">
+          {/* Market Overview */}
+          <div className="side-section">
+            <div className="side-head">
+              <span className="side-title">Market Overview</span>
+              <span className="side-meta">DeFiLlama · Live</span>
             </div>
-          ))}
+            <div className="kpi-grid">
+              {KPIS.map((k, i) => (
+                <div className="kpi" key={i}>
+                  <div className="kpi-lbl">{k.lbl}</div>
+                  <div className="kpi-val">
+                    {k.val}
+                    <span className="dim">{k.unit}</span>
+                  </div>
+                  <div className={`kpi-chg ${k.cls}`}>{k.chg}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Top Assets */}
+          <div className="side-section">
+            <div className="side-head">
+              <span className="side-title">Top Assets · APY</span>
+              <span className="side-meta">7 tracked</span>
+            </div>
+            {ASSETS.map(a => (
+              <div className="asset-row" key={a.sym}>
+                <span className="sym">{a.sym}</span>
+                <span className="nm">{a.nm}</span>
+                <Spark values={a.spk} width={48} height={16} />
+                <span className="ap">{a.apy}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Engine Status */}
+          <div className="side-section">
+            <div className="side-head">
+              <span className="side-title">Engine Status</span>
+              <span className="side-meta mono">Claude</span>
+            </div>
+            <div className="exec-row"><span className="l">분석 엔진</span><span className="v">Claude Sonnet</span></div>
+            <div className="exec-row"><span className="l">데이터 소스</span><span className="v">DeFiLlama</span></div>
+            <div className="exec-row"><span className="l">분석 자산</span><span className="v">7 RWAs</span></div>
+            <div className="exec-row"><span className="l">서버 전송</span><span className="v" style={{ color: 'var(--pos)' }}>없음</span></div>
+          </div>
         </div>
-
-        {/* CTA */}
-        <button onClick={() => onStart(lang)}
-          className="group px-10 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-bold text-lg hover:from-blue-500 hover:to-emerald-500 transition-all duration-300"
-          style={{ boxShadow: '0 0 40px rgba(59,130,246,0.4)' }}>
-          {t.cta}
-          <span className="inline-block ml-1 group-hover:translate-x-1 transition-transform duration-200">→</span>
-        </button>
-        <p className="text-slate-600 text-xs mt-3">{t.ctaSub}</p>
-
-        {/* Footer */}
-        <p className="text-slate-700 text-xs mt-16">{t.powered}</p>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
