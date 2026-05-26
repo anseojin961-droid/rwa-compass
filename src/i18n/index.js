@@ -1,6 +1,6 @@
 export const T = {
   ko: {
-    // Landing
+    // ── Landing ──────────────────────────────────────────────
     badge: 'AI 기반 RWA 내비게이터',
     heroTitle1: '토큰화 실물자산,',
     heroTitle2: '어디서 시작할지 모르겠다면',
@@ -17,31 +17,56 @@ export const T = {
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: '언어',
 
-    // Results header
+    // ── Onboarding ───────────────────────────────────────────
+    onboardingSubtitle: 'AI가 당신의 투자 성향을 분석해 최적의 RWA 자산을 추천해드립니다',
+    questionOf: (cur, total) => `${cur} / ${total} 질문`,
+    percentDone: (pct) => `${pct}% 완료`,
+    startAnalysis: '⚡ AI 분석 시작하기 →',
+    back: '← 이전으로',
+
+    // ── Loading ──────────────────────────────────────────────
+    loadingTitle: 'AI 분석 중',
+    loadingSubtitle: 'Claude가 7개 RWA 자산을 프로필에 맞게 분석하고 있습니다',
+    loadingSteps: [
+      '시장 데이터 수집 중...',
+      '리스크 프로파일 분석 중...',
+      'AI 점수 엔진 실행 중...',
+      '추천 보정 중...',
+      '개인화 리포트 생성 중...',
+    ],
+    loadingAnalyzing: '분석 중...',
+
+    // ── Error ────────────────────────────────────────────────
+    errorLabel: '오류 발생',
+    errorHeading: '분석을 완료하지 못했습니다',
+    errorDesc: '잠시 후 다시 시도해주세요.',
+    retry: '다시 시도하기',
+
+    // ── Results header ───────────────────────────────────────
     reportTitle: '분석 리포트',
     done: '완료',
     reset: '재설정',
 
-    // Profile bar labels
+    // ── Profile bar ──────────────────────────────────────────
     profileLabels: { experience:'경험', investmentAmount:'금액', goal:'목표', riskTolerance:'리스크', preferredChain:'체인', horizon:'기간', liquidityNeed:'유동성', riskPriority:'중점 위험' },
 
-    // Stats
+    // ── Stats ────────────────────────────────────────────────
     avgRisk: '평균 위험 점수',
     avgApy: '평균 표시 APY',
     regulated: '규제 자산 수',
 
-    // AI insight
+    // ── AI insight ───────────────────────────────────────────
     aiSummary: 'AI 비교 요약',
 
-    // Asset list
+    // ── Asset list ───────────────────────────────────────────
     assetComparison: (n) => `자산 비교 (${n}개)`,
     asOf: '확인일',
 
-    // Radar
+    // ── Radar ────────────────────────────────────────────────
     radarTitle: '추천 자산 특성',
     radarAxes: ['수익률', '안전성', '유동성', '규제 명확성', '접근성'],
 
-    // Asset card
+    // ── Asset card ───────────────────────────────────────────
     expectedApy: 'Expected APY',
     minInvestment: 'Min. Investment',
     lockup: 'Lockup',
@@ -53,7 +78,7 @@ export const T = {
     geniusAct: 'GENIUS Act 영향',
     source: '공식 출처',
 
-    // Chat
+    // ── Chat ─────────────────────────────────────────────────
     chatTitle: 'AI 질문하기',
     chatSubtitle: '자산 조건·위험 구조를 물어보세요',
     chatPlaceholder: '환매 조건이나 위험 요인을 질문하세요',
@@ -64,7 +89,7 @@ export const T = {
   },
 
   en: {
-    // Landing
+    // ── Landing ──────────────────────────────────────────────
     badge: 'AI-Powered RWA Navigator',
     heroTitle1: 'Tokenized Real World Assets,',
     heroTitle2: "Don't know where to start?",
@@ -81,31 +106,56 @@ export const T = {
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: 'Language',
 
-    // Results header
+    // ── Onboarding ───────────────────────────────────────────
+    onboardingSubtitle: 'Claude AI analyzes your investor profile and recommends the best RWA assets for you',
+    questionOf: (cur, total) => `Question ${cur} of ${total}`,
+    percentDone: (pct) => `${pct}% complete`,
+    startAnalysis: '⚡ Start AI Analysis →',
+    back: '← Back',
+
+    // ── Loading ──────────────────────────────────────────────
+    loadingTitle: 'AI Analysis Running',
+    loadingSubtitle: 'Claude is analyzing 7 RWA assets against your profile',
+    loadingSteps: [
+      'Fetching market data...',
+      'Analyzing risk profiles...',
+      'Running AI scoring engine...',
+      'Calibrating recommendations...',
+      'Generating personalized report...',
+    ],
+    loadingAnalyzing: 'Analyzing...',
+
+    // ── Error ────────────────────────────────────────────────
+    errorLabel: 'Error',
+    errorHeading: 'Analysis could not be completed',
+    errorDesc: 'Please try again in a moment.',
+    retry: 'Try Again',
+
+    // ── Results header ───────────────────────────────────────
     reportTitle: 'Analysis Report',
     done: 'Done',
     reset: 'Reset',
 
-    // Profile bar labels
+    // ── Profile bar ──────────────────────────────────────────
     profileLabels: { experience:'Experience', investmentAmount:'Amount', goal:'Goal', riskTolerance:'Risk', preferredChain:'Chain', horizon:'Horizon', liquidityNeed:'Liquidity', riskPriority:'Risk Focus' },
 
-    // Stats
+    // ── Stats ────────────────────────────────────────────────
     avgRisk: 'Avg. Risk Score',
     avgApy: 'Avg. Displayed APY',
     regulated: 'Regulated Assets',
 
-    // AI insight
+    // ── AI insight ───────────────────────────────────────────
     aiSummary: 'AI Summary',
 
-    // Asset list
+    // ── Asset list ───────────────────────────────────────────
     assetComparison: (n) => `Asset Comparison (${n})`,
     asOf: 'As of',
 
-    // Radar
+    // ── Radar ────────────────────────────────────────────────
     radarTitle: 'Top Asset Profile',
     radarAxes: ['Yield', 'Safety', 'Liquidity', 'Regulatory', 'Accessibility'],
 
-    // Asset card
+    // ── Asset card ───────────────────────────────────────────
     expectedApy: 'Expected APY',
     minInvestment: 'Min. Investment',
     lockup: 'Lockup',
@@ -117,7 +167,7 @@ export const T = {
     geniusAct: 'GENIUS Act Impact',
     source: 'Official Source',
 
-    // Chat
+    // ── Chat ─────────────────────────────────────────────────
     chatTitle: 'Ask AI',
     chatSubtitle: 'Ask about asset terms & risk structure',
     chatPlaceholder: 'Ask about redemption terms or risk factors',
@@ -128,7 +178,7 @@ export const T = {
   },
 
   zh: {
-    // Landing
+    // ── Landing ──────────────────────────────────────────────
     badge: 'AI驱动的RWA导航器',
     heroTitle1: '代币化真实世界资产，',
     heroTitle2: '不知道从哪里开始？',
@@ -145,31 +195,56 @@ export const T = {
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: '语言',
 
-    // Results header
+    // ── Onboarding ───────────────────────────────────────────
+    onboardingSubtitle: 'Claude AI分析您的投资偏好，为您推荐最适合的RWA资产',
+    questionOf: (cur, total) => `第 ${cur} / ${total} 题`,
+    percentDone: (pct) => `${pct}% 完成`,
+    startAnalysis: '⚡ 开始AI分析 →',
+    back: '← 返回',
+
+    // ── Loading ──────────────────────────────────────────────
+    loadingTitle: 'AI分析运行中',
+    loadingSubtitle: 'Claude正在根据您的投资偏好分析7种RWA资产',
+    loadingSteps: [
+      '正在获取市场数据...',
+      '正在分析风险特征...',
+      '正在运行AI评分引擎...',
+      '正在校准推荐结果...',
+      '正在生成个性化报告...',
+    ],
+    loadingAnalyzing: '分析中...',
+
+    // ── Error ────────────────────────────────────────────────
+    errorLabel: '错误',
+    errorHeading: '分析未能完成',
+    errorDesc: '请稍后再试。',
+    retry: '重试',
+
+    // ── Results header ───────────────────────────────────────
     reportTitle: '分析报告',
     done: '完成',
     reset: '重置',
 
-    // Profile bar labels
+    // ── Profile bar ──────────────────────────────────────────
     profileLabels: { experience:'经验', investmentAmount:'金额', goal:'目标', riskTolerance:'风险', preferredChain:'链', horizon:'期限', liquidityNeed:'流动性', riskPriority:'风险重点' },
 
-    // Stats
+    // ── Stats ────────────────────────────────────────────────
     avgRisk: '平均风险评分',
     avgApy: '平均APY',
     regulated: '合规资产数',
 
-    // AI insight
+    // ── AI insight ───────────────────────────────────────────
     aiSummary: 'AI综合摘要',
 
-    // Asset list
+    // ── Asset list ───────────────────────────────────────────
     assetComparison: (n) => `资产比较 (${n}种)`,
     asOf: '更新日期',
 
-    // Radar
+    // ── Radar ────────────────────────────────────────────────
     radarTitle: '推荐资产特征',
     radarAxes: ['收益率', '安全性', '流动性', '监管明确性', '可及性'],
 
-    // Asset card
+    // ── Asset card ───────────────────────────────────────────
     expectedApy: '预期年化收益',
     minInvestment: '最低投资',
     lockup: '锁仓期',
@@ -181,7 +256,7 @@ export const T = {
     geniusAct: 'GENIUS法案影响',
     source: '官方来源',
 
-    // Chat
+    // ── Chat ─────────────────────────────────────────────────
     chatTitle: 'AI问答',
     chatSubtitle: '询问资产条件与风险结构',
     chatPlaceholder: '询问赎回条件或风险因素',
@@ -197,4 +272,3 @@ export const LANGS = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
   { code: 'zh', label: '中文',    flag: '🇨🇳' },
 ];
-

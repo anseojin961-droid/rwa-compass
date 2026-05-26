@@ -1,35 +1,35 @@
 import { useEffect, useState } from 'react';
+import { T } from '../i18n/index.js';
 
-const STEPS = [
-  { label: 'Fetching market data...', icon: '📡' },
-  { label: 'Analyzing risk profiles...', icon: '🔍' },
-  { label: 'Running AI scoring engine...', icon: '🤖' },
-  { label: 'Calibrating recommendations...', icon: '⚡' },
-  { label: 'Generating personalized report...', icon: '📊' },
-];
+export default function LoadingAnalysis({ lang = 'ko' }) {
+  const t = T[lang] || T.ko;
+  const STEPS = t.loadingSteps.map((label, i) => ({
+    label,
+    icon: ['📡', '🔍', '🤖', '⚡', '📊'][i],
+  }));
 
-export default function LoadingAnalysis() {
   const [current, setCurrent] = useState(0);
   const [done, setDone] = useState([]);
 
   useEffect(() => {
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       setCurrent(prev => {
         if (prev < STEPS.length - 1) {
           setDone(d => [...d, prev]);
           return prev + 1;
         }
-        clearInterval(t);
+        clearInterval(timer);
         return prev;
       });
     }, 1200);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4"
       style={{ background: 'linear-gradient(135deg, #050d1a 0%, #070f1e 50%, #050d1a 100%)' }}>
       <div className="w-full max-w-md">
+
         {/* Spinner */}
         <div className="flex justify-center mb-12">
           <div className="relative">
@@ -46,8 +46,8 @@ export default function LoadingAnalysis() {
         </div>
 
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-white mb-2">AI Analysis Running</h2>
-          <p className="text-slate-400 text-sm">Claude is analyzing 7 RWA assets against your profile</p>
+          <h2 className="text-2xl font-bold text-white mb-2">{t.loadingTitle}</h2>
+          <p className="text-slate-400 text-sm">{t.loadingSubtitle}</p>
         </div>
 
         <div className="space-y-3">
@@ -61,7 +61,7 @@ export default function LoadingAnalysis() {
                 :           'border-slate-800/50'
               }`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 transition-all ${
-                  isDone   ? 'bg-emerald-500/20 border border-emerald-500/40'
+                  isDone    ? 'bg-emerald-500/20 border border-emerald-500/40'
                   : isActive ? 'bg-blue-500/20 border border-blue-500/40 animate-pulse'
                   :            'bg-slate-800 border border-slate-700'
                 }`}>
@@ -90,7 +90,7 @@ export default function LoadingAnalysis() {
               style={{ width:`${((current+1)/STEPS.length)*100}%` }} />
           </div>
           <div className="flex justify-between mt-1.5">
-            <span className="text-xs text-slate-600">Analyzing...</span>
+            <span className="text-xs text-slate-600">{t.loadingAnalyzing}</span>
             <span className="text-xs text-slate-500">{Math.round(((current+1)/STEPS.length)*100)}%</span>
           </div>
         </div>
