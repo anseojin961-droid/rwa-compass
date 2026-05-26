@@ -71,7 +71,7 @@ Asset IDs: ${assets.map(a => a.id).join(', ')}`;
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 1500,
+          max_tokens: 4096,
           system: SYSTEM_PROMPT,
           messages: [{ role: 'user', content: prompt }],
         }),
@@ -86,7 +86,29 @@ Asset IDs: ${assets.map(a => a.id).join(', ')}`;
       const text = data.content[0].text.trim();
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error('Invalid response format from AI');
-      const parsed = JSON.parse(jsonMatch[0]);
+
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch {
+        // Response was truncated — attempt to salvage partial JSON
+        let partial = jsonMatch[0];
+        // Close any open arrays/objects by counting brackets
+        const opens = (partial.match(/\[|\{/g) || []).length;
+        const closes = (partial.match(/\]|\}/g) || []).length;
+        const diff = opens - closes;
+        // Remove trailing incomplete object/property
+        partial = partial.replace(/,?\s*\{[^}]*$/, '');
+        // Close open arrays and objects
+        for (let i = 0; i < diff; i++) {
+          partial += i === diff - 1 ? '}' : ']';
+        }
+        try {
+          parsed = JSON.parse(partial);
+        } catch {
+          throw new Error(`JSON parse error — response may have been cut off. Try again.`);
+        }
+      }
       return parsed;
     } catch (err) {
       setError(err.message);
