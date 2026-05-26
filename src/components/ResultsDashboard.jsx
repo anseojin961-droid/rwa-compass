@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
 import AssetCard from './AssetCard.jsx';
 import AIChat from './AIChat.jsx';
 import { DATASET_NOTICE, DATASET_REVIEWED_AT, RWA_ASSETS } from '../data/assets.js';
 import { T } from '../i18n/index.js';
 import { QUESTIONS_I18N } from '../i18n/questions.js';
+import { AMOUNT_MAP } from '../utils/riskScoring.js';
 
 const PROFILE_KEYS = ['experience','investmentAmount','goal','riskTolerance','preferredChain','horizon','liquidityNeed','riskPriority'];
 
@@ -14,7 +15,15 @@ function getValueLabel(key, value, lang) {
   return q?.options.find(o => o.value === value)?.label || value;
 }
 
-function Header({ onReset, t }) {
+function Header({ onReset, onShare, t }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = useCallback(async () => {
+    await onShare();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [onShare]);
+
   return (
     <div className="flex items-center gap-3 border-b border-slate-700/50 px-5 py-3.5 sticky top-0 backdrop-blur-sm z-10"
       style={{ background:'rgba(5,13,26,0.95)' }}>
@@ -24,11 +33,20 @@ function Header({ onReset, t }) {
       <span className="text-white text-sm font-semibold gradient-text">RWA Compass</span>
       <span className="text-slate-600 text-sm">—</span>
       <span className="text-slate-400 text-sm">{t.reportTitle}</span>
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2">
         <div className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-slate-500 text-xs">{t.done}</span>
         </div>
+        <button onClick={handleShare}
+          className={`text-xs px-3 py-1.5 rounded-lg border transition-all duration-300 flex items-center gap-1.5 ${
+            copied
+              ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10'
+              : 'border-slate-700/50 text-slate-400 hover:border-blue-500/40 hover:text-slate-300'
+          }`}>
+          <span>{copied ? '✓' : '↗'}</span>
+          <span>{copied ? t.shareCopied : t.shareBtn}</span>
+        </button>
         <button onClick={onReset}
           className="text-xs px-3 py-1.5 rounded-lg border border-slate-700/50 text-slate-400 hover:border-blue-500/40 hover:text-slate-300 transition-colors">
           {t.reset}
@@ -114,25 +132,45 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
   const analyses   = useMemo(() => aiResult?.analyses  || [], [aiResult]);
   const topPickIds = useMemo(() => aiResult?.topPicks || [], [aiResult]);
 
+  // Fix 2: 사용자 예산 금액 계산
+  const userBudget = useMemo(() => AMOUNT_MAP[profile?.investmentAmount] ?? Infinity, [profile]);
+
   const enrichedAssets = useMemo(() => RWA_ASSETS.map(a => {
     const live = marketData[a.id];
     if (!live) return a;
     return { ...a, apy: { min: live.apy, max: live.apy }, isLive: true };
   }), [marketData]);
 
-  const sorted = useMemo(() => [...enrichedAssets].sort((a,b) => {
-    const aTop = topPickIds.includes(a.id), bTop = topPickIds.includes(b.id);
-    if (aTop && !bTop) return -1;
-    if (!aTop && bTop) return 1;
-    return (analyses.find(x=>x.id===a.id)?.personalizedRiskScore ?? a.riskScore)
-         - (analyses.find(x=>x.id===b.id)?.personalizedRiskScore ?? b.riskScore);
-  }), [analyses, topPickIds, enrichedAssets]);
+  const sorted = useMemo(() => {
+    const withBudget = enrichedAssets.map(a => ({ ...a, _budgetExceeds: userBudget < a.minInvestment }));
+    return [...withBudget].sort((a, b) => {
+      // 예산 초과 자산은 맨 뒤로
+      if (a._budgetExceeds && !b._budgetExceeds) return 1;
+      if (!a._budgetExceeds && b._budgetExceeds) return -1;
+      const aTop = topPickIds.includes(a.id), bTop = topPickIds.includes(b.id);
+      if (aTop && !bTop) return -1;
+      if (!aTop && bTop) return 1;
+      return (analyses.find(x=>x.id===a.id)?.personalizedRiskScore ?? a.riskScore)
+           - (analyses.find(x=>x.id===b.id)?.personalizedRiskScore ?? b.riskScore);
+    });
+  }, [analyses, topPickIds, enrichedAssets, userBudget]);
 
   const topAssets = sorted.filter(a => topPickIds.includes(a.id));
 
+  // Fix 4: 공유 핸들러
+  const handleShare = useCallback(async () => {
+    const topNames = topAssets.map(a => a.name).join(', ') || '—';
+    const url = 'https://rwa-compass.vercel.app/';
+    const text = t.shareText(topNames, url);
+    if (navigator.share) {
+      try { await navigator.share({ title: 'RWA Compass', text }); return; } catch {}
+    }
+    await navigator.clipboard.writeText(text).catch(() => {});
+  }, [topAssets, t]);
+
   return (
     <div className="min-h-screen" style={{ background:'linear-gradient(135deg, #050d1a 0%, #070f1e 50%, #050d1a 100%)' }}>
-      <Header onReset={onReset} t={t} />
+      <Header onReset={onReset} onShare={handleShare} t={t} />
 
       <div className="max-w-7xl mx-auto px-5 py-7">
         <ProfileBar profile={profile} lang={lang} t={t} />
@@ -161,6 +199,7 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
                 <AssetCard key={asset.id} asset={asset}
                   analysis={analyses.find(a => a.id===asset.id)}
                   isTopPick={topPickIds.includes(asset.id)}
+                  budgetExceeds={asset._budgetExceeds}
                   index={i} t={t} />
               ))}
             </div>

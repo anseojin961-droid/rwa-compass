@@ -21,7 +21,7 @@ const TYPE_COLORS = {
   orange: { textColor:'text-orange-400',  bgColor:'bg-orange-400/10',  borderColor:'border-orange-400/30'  },
 };
 
-export default function AssetCard({ asset, analysis, isTopPick, index, t }) {
+export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, index, t }) {
   const [expanded, setExpanded] = useState(false);
 
   const fitKey = analysis?.fitAssessment || analysis?.recommendation || 'REVIEW_CAREFULLY';
@@ -32,11 +32,22 @@ export default function AssetCard({ asset, analysis, isTopPick, index, t }) {
 
   return (
     <div className={`animate-slide-up rounded-2xl border transition-all duration-300 overflow-hidden stagger-${Math.min(index+1,7)} ${
-      isTopPick ? 'border-blue-500/40 hover:border-blue-500/60' : 'border-slate-700/50 hover:border-slate-600/60'
+      budgetExceeds
+        ? 'border-slate-800/60 opacity-60'
+        : isTopPick ? 'border-blue-500/40 hover:border-blue-500/60' : 'border-slate-700/50 hover:border-slate-600/60'
     } card-glass`}
-      style={isTopPick ? { boxShadow:'0 0 30px rgba(59,130,246,0.1)' } : {}}>
+      style={isTopPick && !budgetExceeds ? { boxShadow:'0 0 30px rgba(59,130,246,0.1)' } : {}}>
 
-      {isTopPick && (
+      {budgetExceeds && (
+        <div className="bg-slate-800/80 border-b border-slate-700/50 px-4 py-2 flex items-center gap-2">
+          <span className="text-slate-500 text-sm">🚫</span>
+          <span className="text-slate-500 text-xs font-semibold tracking-wide uppercase">
+            {t?.budgetExceeds || 'Budget Exceeded'}
+          </span>
+          <span className="text-slate-600 text-xs ml-1">— {t?.budgetExceedsDesc || 'Minimum investment exceeds your budget'}</span>
+        </div>
+      )}
+      {!budgetExceeds && isTopPick && (
         <div className="bg-gradient-to-r from-blue-600/20 to-emerald-600/20 border-b border-blue-500/20 px-4 py-2">
           <span className="text-yellow-400 text-sm">⭐</span>
           <span className="text-blue-300 text-xs font-semibold tracking-wide uppercase ml-1.5">AI Top Pick</span>

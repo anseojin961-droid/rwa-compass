@@ -1,5 +1,5 @@
 // 투자 금액 텍스트 → 숫자 변환
-const AMOUNT_MAP = {
+export const AMOUNT_MAP = {
   'Under $1K': 999,
   '$1K–$50K': 25000,
   '$50K–$500K': 275000,

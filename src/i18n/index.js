@@ -86,6 +86,13 @@ export const T = {
     chatExamples: '예시 질문',
     chatSender: '🧭 RWA Compass',
     chatError: '오류',
+
+    // ── Budget / Share ───────────────────────────────────────
+    budgetExceeds: '예산 초과',
+    budgetExceedsDesc: '최소 투자금이 선택한 예산을 초과합니다',
+    shareBtn: '공유',
+    shareCopied: '클립보드에 복사되었습니다!',
+    shareText: (topNames, url) => `🧭 RWA Compass 분석 결과\n\n추천 자산: ${topNames}\n\n지금 바로 분석해보기 👉 ${url}`,
   },
 
   en: {
@@ -175,6 +182,13 @@ export const T = {
     chatExamples: 'Example questions',
     chatSender: '🧭 RWA Compass',
     chatError: 'Error',
+
+    // ── Budget / Share ───────────────────────────────────────
+    budgetExceeds: 'Budget Exceeded',
+    budgetExceedsDesc: 'Minimum investment exceeds your selected budget',
+    shareBtn: 'Share',
+    shareCopied: 'Copied to clipboard!',
+    shareText: (topNames, url) => `🧭 RWA Compass Analysis\n\nTop picks: ${topNames}\n\nAnalyze yours 👉 ${url}`,
   },
 
   zh: {
@@ -264,6 +278,13 @@ export const T = {
     chatExamples: '示例问题',
     chatSender: '🧭 RWA Compass',
     chatError: '错误',
+
+    // ── Budget / Share ───────────────────────────────────────
+    budgetExceeds: '超出预算',
+    budgetExceedsDesc: '最低投资金额超出您选择的预算范围',
+    shareBtn: '分享',
+    shareCopied: '已复制到剪贴板！',
+    shareText: (topNames, url) => `🧭 RWA Compass 分析结果\n\n推荐资产：${topNames}\n\n立即分析 👉 ${url}`,
   },
 };
 

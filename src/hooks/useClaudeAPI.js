@@ -6,9 +6,14 @@ export function useClaudeAPI() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const analyzeAssets = useCallback(async (userProfile, assets, apiKey) => {
+  const analyzeAssets = useCallback(async (userProfile, assets, apiKey, lang = 'ko') => {
     setLoading(true);
     setError(null);
+
+    const langInstruction =
+      lang === 'ko' ? 'Write ALL text fields (portfolioInsight, reasoning, keyRisk, geniusActImpact) in Korean (한국어).' :
+      lang === 'zh' ? 'Write ALL text fields (portfolioInsight, reasoning, keyRisk, geniusActImpact) in Simplified Chinese (简体中文).' :
+                      'Write ALL text fields in English.';
 
     const profileDesc = `
 Experience Level: ${userProfile.experience}
@@ -25,7 +30,9 @@ Primary Risk Concern: ${userProfile.riskPriority}
 - ${a.name} (${a.ticker}): APY ${a.apy.min}${a.apy.min !== a.apy.max ? '-' + a.apy.max : ''}%, Base Risk: ${a.risk}, Chain: ${a.chains.join('/')}, Type: ${a.type}, Min Investment: $${a.minInvestment.toLocaleString()}, Lockup: ${a.lockupDays} days
 `).join('');
 
-    const prompt = `Analyze these RWA assets for a user with this profile:
+    const prompt = `${langInstruction}
+
+Analyze these RWA assets for a user with this profile:
 
 USER PROFILE:
 ${profileDesc}
