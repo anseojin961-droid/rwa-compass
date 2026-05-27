@@ -14,6 +14,8 @@ export const T = {
     statsQuestions: '8가지 질문', statsQuestionsSub: '맞춤 프로파일링',
     statsAI: 'Claude AI',        statsAISub: '실시간 분석 엔진',
     cta: 'AI 분석 시작하기',     ctaSub: '무료 · 3분 소요 · 가입 불필요',
+    ctaPips: ['무료', '3분 소요', '가입 불필요'],
+    engineStatus: { title: '엔진 현황', engine: '분석 엔진', dataSource: '데이터 소스', assets: '분석 자산', serverSend: '서버 전송', none: '없음' },
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: '언어',
 
@@ -110,6 +112,8 @@ export const T = {
     statsQuestions: '8 Questions', statsQuestionsSub: 'Personalized Profiling',
     statsAI: 'Claude AI',         statsAISub: 'Real-time Analysis',
     cta: 'Start AI Analysis',     ctaSub: 'Free · 3 minutes · No sign-up',
+    ctaPips: ['Free', '3 min', 'No sign-up'],
+    engineStatus: { title: 'Engine Status', engine: 'Analysis Engine', dataSource: 'Data Source', assets: 'Tracked Assets', serverSend: 'Server Transfer', none: 'None' },
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: 'Language',
 
@@ -206,6 +210,8 @@ export const T = {
     statsQuestions: '8个问题',  statsQuestionsSub: '个性化分析',
     statsAI: 'Claude AI',       statsAISub: '实时分析引擎',
     cta: '开始AI分析',          ctaSub: '免费 · 3分钟 · 无需注册',
+    ctaPips: ['免费', '3分钟', '无需注册'],
+    engineStatus: { title: '引擎状态', engine: '分析引擎', dataSource: '数据来源', assets: '追踪资产', serverSend: '服务器传输', none: '无' },
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: '语言',
 

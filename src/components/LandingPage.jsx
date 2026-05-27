@@ -130,9 +130,7 @@ export default function LandingPage({ onStart }) {
               {t.cta} <Icon name="arrow-right" size={16} />
             </button>
             <div className="cta-meta">
-              <span className="pip">무료</span>
-              <span className="pip">3분 소요</span>
-              <span className="pip">가입 불필요</span>
+              {t.ctaPips.map((p, i) => <span className="pip" key={i}>{p}</span>)}
             </div>
           </div>
         </div>
@@ -178,13 +176,13 @@ export default function LandingPage({ onStart }) {
           {/* Engine Status */}
           <div className="side-section">
             <div className="side-head">
-              <span className="side-title">Engine Status</span>
+              <span className="side-title">{t.engineStatus.title}</span>
               <span className="side-meta mono">Claude</span>
             </div>
-            <div className="exec-row"><span className="l">분석 엔진</span><span className="v">Claude Sonnet</span></div>
-            <div className="exec-row"><span className="l">데이터 소스</span><span className="v">DeFiLlama</span></div>
-            <div className="exec-row"><span className="l">분석 자산</span><span className="v">7 RWAs</span></div>
-            <div className="exec-row"><span className="l">서버 전송</span><span className="v" style={{ color: 'var(--pos)' }}>없음</span></div>
+            <div className="exec-row"><span className="l">{t.engineStatus.engine}</span><span className="v">Claude Sonnet</span></div>
+            <div className="exec-row"><span className="l">{t.engineStatus.dataSource}</span><span className="v">DeFiLlama</span></div>
+            <div className="exec-row"><span className="l">{t.engineStatus.assets}</span><span className="v">7 RWAs</span></div>
+            <div className="exec-row"><span className="l">{t.engineStatus.serverSend}</span><span className="v" style={{ color: 'var(--pos)' }}>{t.engineStatus.none}</span></div>
           </div>
         </div>
       </div>
