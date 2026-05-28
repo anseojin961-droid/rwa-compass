@@ -70,7 +70,7 @@ Asset IDs: ${assets.map(a => a.id).join(', ')}`;
           'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           max_tokens: 4096,
           system: SYSTEM_PROMPT,
           messages: [{ role: 'user', content: prompt }],
@@ -139,7 +139,7 @@ Answer questions clearly and concisely. Use specific numbers and data when avail
         'anthropic-dangerous-direct-browser-access': 'true',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 600,
         system: systemWithContext,
         messages,

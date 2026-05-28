@@ -44,7 +44,7 @@ export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, i
     <div className={`acard${isTopPick && !budgetExceeds ? ' top' : ''}${budgetExceeds ? ' budget-exceeded' : ''}`}>
       {budgetExceeds && (
         <div className="acard-budget-banner">
-          🚫 <span>예산 초과 — 최소 투자금 {formatMinInvestment(asset.minInvestment)}</span>
+          🚫 <span>{t.budgetExceeds} — {t.minInvestment} {formatMinInvestment(asset.minInvestment)}</span>
         </div>
       )}
 
@@ -113,7 +113,7 @@ export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, i
           color={isTopPick && !budgetExceeds ? 'var(--ac-bright)' : 'var(--tx-2)'}
         />
         <span className="acard-cta" onClick={() => setExpanded(!expanded)}>
-          {expanded ? '접기' : '위험 상세 보기'} <Icon name="arrow-right" size={11} />
+          {expanded ? t.collapseBtn : t.expandBtn} <Icon name="arrow-right" size={11} />
         </span>
       </div>
 
