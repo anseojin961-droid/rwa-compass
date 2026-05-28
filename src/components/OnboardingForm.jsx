@@ -57,18 +57,6 @@ function mapOptionIcon(emoji) {
   return OPTION_ICON_MAP[emoji] || 'drop';
 }
 
-// ── "Why we ask" texts ────────────────────────────────────────────────────────
-
-const WHY_TEXTS = [
-  '투자 경험은 위험 허용도와 가장 강한 상관계수를 가집니다.',
-  '투자 금액에 따라 최소 입금액 조건이 다른 자산이 필터링됩니다.',
-  '목표는 예상 수익률 분포의 무게중심을 결정합니다.',
-  '최대 손실폭은 자산별 historical drawdown과 비교됩니다.',
-  '체인별 가스비, 결제 속도, 유동성 분포가 다릅니다.',
-  '보유 기간이 짧을수록 데일리 유동성 자산이 우선됩니다.',
-  '환매 주기는 자산의 유동성 점수에 직접 반영됩니다.',
-  '가장 우려하는 위험 축에 해당 자산의 점수가 가중 패널티로 반영됩니다.',
-];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -88,7 +76,7 @@ function Chrome({ lang, setLang, onReset }) {
       <div className="chrome-right">
         <span className="live-dot">Live · DeFiLlama</span>
         <button className="btn-ghost" onClick={onReset}>
-          <Icon name="refresh" size={13} /> 처음으로
+          <Icon name="refresh" size={13} /> {t.backToStart}
         </button>
         <div className="lang-switch">
           {LANGS.map(l => (
@@ -118,6 +106,7 @@ export default function OnboardingForm({ onComplete, lang: initialLang = 'ko' })
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState(EMPTY);
 
+  const t = T[lang] || T.ko;
   const QUESTIONS = QUESTIONS_I18N[lang] || QUESTIONS_I18N.ko;
   const total = QUESTIONS.length;
   const q = QUESTIONS[step];
@@ -125,7 +114,7 @@ export default function OnboardingForm({ onComplete, lang: initialLang = 'ko' })
   const sel = profile[q.id] || null;
   const answeredCount = Object.values(profile).filter(Boolean).length;
   const pct = Math.round((answeredCount / total) * 100);
-  const whyText = WHY_TEXTS[step] || '';
+  const whyText = t.whyTexts?.[step] || '';
 
   function onSelect(value) {
     setProfile(prev => ({ ...prev, [q.id]: value }));
@@ -181,9 +170,9 @@ export default function OnboardingForm({ onComplete, lang: initialLang = 'ko' })
           </div>
 
           <div style={{ marginTop: 'auto', paddingTop: 18, borderTop: '1px solid var(--line-1)' }}>
-            <div className="exec-row"><span className="l">예상 소요</span><span className="v">~3 min</span></div>
-            <div className="exec-row"><span className="l">분석 자산</span><span className="v">7 RWAs</span></div>
-            <div className="exec-row"><span className="l">엔진</span><span className="v">Claude</span></div>
+            <div className="exec-row"><span className="l">{t.estimatedTime}</span><span className="v">~3 min</span></div>
+            <div className="exec-row"><span className="l">{t.analyzedAssetsLabel}</span><span className="v">7 RWAs</span></div>
+            <div className="exec-row"><span className="l">{t.engineLabel}</span><span className="v">Claude</span></div>
           </div>
         </div>
 
@@ -191,12 +180,8 @@ export default function OnboardingForm({ onComplete, lang: initialLang = 'ko' })
         <div className="qmain">
           {/* Progress header */}
           <div className="q-progress">
-            <span>
-              Step{' '}
-              <span className="mono dim-2">{String(step + 1).padStart(2, '0')}</span>
-              {' '}/ <span className="mono dim">{String(total).padStart(2, '0')}</span>
-            </span>
-            <span className="pct">{pct}% complete</span>
+            <span>{t.questionOf(step + 1, total)}</span>
+            <span className="pct">{t.percentDone(pct)}</span>
           </div>
 
           {/* Segment bar */}
@@ -247,10 +232,10 @@ export default function OnboardingForm({ onComplete, lang: initialLang = 'ko' })
           {/* Navigation */}
           <div className="qnav">
             <button className="btn-ghost" disabled={step === 0} onClick={onBack}>
-              <Icon name="arrow-left" size={13} /> 이전
+              <Icon name="arrow-left" size={13} /> {t.prevStep}
             </button>
             <button className="btn-primary" disabled={!sel} onClick={onNext}>
-              {isLast ? '분석 시작' : '다음 질문'}{' '}
+              {isLast ? t.beginAnalysis : t.nextStep}{' '}
               <Icon name="arrow-right" size={14} />
             </button>
           </div>
@@ -259,27 +244,27 @@ export default function OnboardingForm({ onComplete, lang: initialLang = 'ko' })
         {/* ── Right rail: live profile ────────────────────────────────────── */}
         <div className="qrail-right">
           <div>
-            <div className="side-title" style={{ marginBottom: 14 }}>Live Profile</div>
+            <div className="side-title" style={{ marginBottom: 14 }}>{t.liveProfile}</div>
             <div className="tel-row">
-              <span className="l">완료 답변</span>
+              <span className="l">{t.completedAnswers}</span>
               <span className="v ac">{answeredCount} / {total}</span>
             </div>
             <div className="tel-row">
-              <span className="l">현재 단계</span>
+              <span className="l">{t.currentStep}</span>
               <span className="v">{QUESTION_ENGLISH[q.id]}</span>
             </div>
             <div className="tel-row">
-              <span className="l">데이터 저장</span>
-              <span className="v" style={{ color: 'var(--pos)' }}>로컬 전용</span>
+              <span className="l">{t.dataStorage}</span>
+              <span className="v" style={{ color: 'var(--pos)' }}>{t.localOnly}</span>
             </div>
             <div className="tel-row">
-              <span className="l">서버 전송</span>
-              <span className="v">없음</span>
+              <span className="l">{t.serverTransfer}</span>
+              <span className="v">{t.noneValue}</span>
             </div>
           </div>
 
           <div>
-            <div className="side-title" style={{ marginBottom: 14 }}>Why we ask</div>
+            <div className="side-title" style={{ marginBottom: 14 }}>{t.whyWeAsk}</div>
             <p className="dim-2" style={{ fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>
               {whyText}
             </p>

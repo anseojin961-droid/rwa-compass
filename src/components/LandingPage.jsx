@@ -141,7 +141,7 @@ export default function LandingPage({ onStart }) {
           <div className="side-section">
             <div className="side-head">
               <span className="side-title">Market Overview</span>
-              <span className="side-meta">DeFiLlama · Live</span>
+              <span className="side-meta">DeFiLlama · Est.</span>
             </div>
             <div className="kpi-grid">
               {KPIS.map((k, i) => (

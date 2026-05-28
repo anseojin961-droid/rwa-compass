@@ -77,6 +77,17 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
   const analyses   = useMemo(() => aiResult?.analyses  || [], [aiResult]);
   const topPickIds = useMemo(() => aiResult?.topPicks  || [], [aiResult]);
 
+  const allocation = useMemo(() => {
+    const riskMap = { Low: 0, Medium: 1, High: 2 };
+    const goalMap = { 'Stable yield': 0, Balanced: 1, 'High yield': 2 };
+    const ri = riskMap[profile?.riskTolerance] ?? 1;
+    const gi = goalMap[profile?.goal] ?? 1;
+    const score = Math.round((ri + gi) / 2);
+    if (score === 0) return { core: 75, satellite: 20, learn: 5 };
+    if (score === 2) return { core: 40, satellite: 45, learn: 15 };
+    return { core: 60, satellite: 30, learn: 10 };
+  }, [profile]);
+
   const userBudget = useMemo(() => AMOUNT_MAP[profile?.investmentAmount] ?? Infinity, [profile]);
 
   const enrichedAssets = useMemo(() => RWA_ASSETS.map(a => {
@@ -140,7 +151,7 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
       <div className="rep">
         {/* ── Left: Profile panel ── */}
         <div className="rep-left">
-          <div className="side-title" style={{ marginBottom: 14 }}>Your Profile</div>
+          <div className="side-title" style={{ marginBottom: 14 }}>{t.yourProfile}</div>
           {PROFILE_KEYS.filter(k => profile[k]).map(k => (
             <div className="rep-profile-block" key={k}>
               <span className="l">{t.profileLabels[k]}</span>
@@ -149,33 +160,33 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
           ))}
 
           <div style={{ marginTop: 22 }}>
-            <div className="side-title" style={{ marginBottom: 12 }}>Allocation Suggestion</div>
+            <div className="side-title" style={{ marginBottom: 12 }}>{t.allocationTitle}</div>
             <div className="alloc-bar">
-              <div className="alloc-seg" style={{ width: '60%', background: 'var(--ac)' }} />
-              <div className="alloc-seg" style={{ width: '30%', background: 'var(--ac-soft)' }} />
-              <div className="alloc-seg" style={{ width: '10%', background: 'var(--bg-3)' }} />
+              <div className="alloc-seg" style={{ width: `${allocation.core}%`, background: 'var(--ac)' }} />
+              <div className="alloc-seg" style={{ width: `${allocation.satellite}%`, background: 'var(--ac-soft)' }} />
+              <div className="alloc-seg" style={{ width: `${allocation.learn}%`, background: 'var(--bg-3)' }} />
             </div>
             <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6, fontSize: 11.5 }}>
               <div className="exec-row">
                 <span className="l" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ width: 8, height: 8, background: 'var(--ac)', borderRadius: 2 }}></span>
-                  Core
+                  {t.allocationCore}
                 </span>
-                <span className="v">60%</span>
+                <span className="v">{allocation.core}%</span>
               </div>
               <div className="exec-row">
                 <span className="l" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ width: 8, height: 8, background: 'var(--ac-soft)', borderRadius: 2 }}></span>
-                  Satellite
+                  {t.allocationSatellite}
                 </span>
-                <span className="v">30%</span>
+                <span className="v">{allocation.satellite}%</span>
               </div>
               <div className="exec-row">
                 <span className="l" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ width: 8, height: 8, background: 'var(--bg-3)', borderRadius: 2 }}></span>
-                  Learn
+                  {t.allocationLearn}
                 </span>
-                <span className="v">10%</span>
+                <span className="v">{allocation.learn}%</span>
               </div>
             </div>
           </div>
