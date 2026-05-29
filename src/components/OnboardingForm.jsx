@@ -60,7 +60,7 @@ function mapOptionIcon(emoji) {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function Chrome({ lang, setLang, onReset }) {
+function Chrome({ lang, setLang, onReset, t }) {
   return (
     <div className="chrome">
       <div className="chrome-left">
@@ -140,7 +140,7 @@ export default function OnboardingForm({ onComplete, lang: initialLang = 'ko' })
 
   return (
     <>
-      <Chrome lang={lang} setLang={setLang} onReset={onReset} />
+      <Chrome lang={lang} setLang={setLang} onReset={onReset} t={t} />
 
       <div className="qwrap">
         {/* ── Left rail: survey path ──────────────────────────────────────── */}
