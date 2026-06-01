@@ -4,7 +4,7 @@ export const T = {
     badge: 'AI 기반 RWA 내비게이터',
     heroTitle1: '토큰화 실물자산,',
     heroTitle2: '어디서 시작할지 모르겠다면',
-    heroDesc: 'Claude AI가 8가지 질문으로 투자 성향을 분석하고\n최적의 RWA 자산을 추천해드립니다',
+    heroDesc: 'Claude AI가 8가지 질문으로 투자 성향을 분석하고\n최적 조건의 RWA 자산을 비교 분석해드립니다',
     features: [
       { icon: '🤖', title: 'AI 개인화 분석', desc: '투자 경험·금액·목표에 맞게 7개 자산을 점수화' },
       { icon: '📡', title: '실시간 시장 데이터', desc: 'DeFiLlama 연동으로 최신 APY 실시간 반영' },
@@ -20,7 +20,7 @@ export const T = {
     langLabel: '언어',
 
     // ── Onboarding ───────────────────────────────────────────
-    onboardingSubtitle: 'AI가 당신의 투자 성향을 분석해 최적의 RWA 자산을 추천해드립니다',
+    onboardingSubtitle: 'AI가 당신의 투자 성향을 분석해 RWA 자산 조건과 위험을 비교해드립니다',
     questionOf: (cur, total) => `${cur} / ${total} 질문`,
     percentDone: (pct) => `${pct}% 완료`,
     startAnalysis: '⚡ AI 분석 시작하기 →',
@@ -69,16 +69,26 @@ export const T = {
     radarAxes: ['수익률', '안전성', '유동성', '규제 명확성', '접근성'],
 
     // ── Asset card ───────────────────────────────────────────
-    expectedApy: 'Expected APY',
-    minInvestment: 'Min. Investment',
-    lockup: 'Lockup',
-    lockupNone: 'None',
-    expandBtn: '▼ 위험 상세보기',
-    collapseBtn: '▲ 접기',
+    expectedApy: '예상 연수익률',
+    minInvestment: '최소 투자금',
+    lockup: '락업',
+    lockupNone: '없음',
+    expandBtn: '위험 상세보기',
+    collapseBtn: '접기',
     riskAnalysis: '위험 분석',
     keyRisk: '핵심 리스크',
     geniusAct: 'GENIUS Act 영향',
     source: '공식 출처',
+    topPick: 'AI 추천',
+    ranked: '순위',
+    aiAnalyst: 'AI 분석',
+    budgetBanner: (min) => `예산 초과 — 최소 투자금 ${min}`,
+    fitLabels: {
+      STRONG_MATCH: '높은 적합도', GOOD_MATCH: '적합',
+      REVIEW_CAREFULLY: '검토 필요', HIGH_MISMATCH: '낮은 적합도',
+      STRONG_BUY: '높은 적합도', BUY: '적합',
+      HOLD: '검토 필요', AVOID: '낮은 적합도',
+    },
 
     // ── Chat ─────────────────────────────────────────────────
     chatTitle: 'AI 질문하기',
@@ -137,7 +147,7 @@ export const T = {
     badge: 'AI-Powered RWA Navigator',
     heroTitle1: 'Tokenized Real World Assets,',
     heroTitle2: "Don't know where to start?",
-    heroDesc: 'Claude AI analyzes your investor profile with 8 questions\nand recommends the best RWA assets for you',
+    heroDesc: 'Claude AI analyzes your investor profile with 8 questions\nand helps you compare RWA assets by fit and risk',
     features: [
       { icon: '🤖', title: 'AI Personalization', desc: 'Scores 7 assets against your experience, budget & goals' },
       { icon: '📡', title: 'Live Market Data', desc: 'Real-time APY powered by DeFiLlama integration' },
@@ -153,7 +163,7 @@ export const T = {
     langLabel: 'Language',
 
     // ── Onboarding ───────────────────────────────────────────
-    onboardingSubtitle: 'Claude AI analyzes your investor profile and recommends the best RWA assets for you',
+    onboardingSubtitle: 'Claude AI analyzes your investor profile and helps you compare RWA assets by fit and risk',
     questionOf: (cur, total) => `Question ${cur} of ${total}`,
     percentDone: (pct) => `${pct}% complete`,
     startAnalysis: '⚡ Start AI Analysis →',
@@ -206,12 +216,22 @@ export const T = {
     minInvestment: 'Min. Investment',
     lockup: 'Lockup',
     lockupNone: 'None',
-    expandBtn: '▼ Risk Details',
-    collapseBtn: '▲ Collapse',
+    expandBtn: 'Risk Details',
+    collapseBtn: 'Collapse',
     riskAnalysis: 'Risk Analysis',
     keyRisk: 'Key Risk',
     geniusAct: 'GENIUS Act Impact',
     source: 'Official Source',
+    topPick: 'AI TOP PICK',
+    ranked: 'RANKED',
+    aiAnalyst: 'AI Analyst',
+    budgetBanner: (min) => `Budget exceeded — min. investment ${min}`,
+    fitLabels: {
+      STRONG_MATCH: 'Strong Fit', GOOD_MATCH: 'Good Fit',
+      REVIEW_CAREFULLY: 'Review', HIGH_MISMATCH: 'Lower Fit',
+      STRONG_BUY: 'Strong Fit', BUY: 'Good Fit',
+      HOLD: 'Review', AVOID: 'Lower Fit',
+    },
 
     // ── Chat ─────────────────────────────────────────────────
     chatTitle: 'Ask AI',
@@ -270,7 +290,7 @@ export const T = {
     badge: 'AI驱动的RWA导航器',
     heroTitle1: '代币化真实世界资产，',
     heroTitle2: '不知道从哪里开始？',
-    heroDesc: 'Claude AI通过8个问题分析您的投资偏好\n为您推荐最适合的RWA资产',
+    heroDesc: 'Claude AI通过8个问题分析您的投资偏好\n帮助您按适配度和风险比较RWA资产',
     features: [
       { icon: '🤖', title: 'AI个性化分析', desc: '根据您的经验、预算和目标对7种资产进行评分' },
       { icon: '📡', title: '实时市场数据', desc: '通过DeFiLlama集成实时获取最新APY数据' },
@@ -286,7 +306,7 @@ export const T = {
     langLabel: '语言',
 
     // ── Onboarding ───────────────────────────────────────────
-    onboardingSubtitle: 'Claude AI分析您的投资偏好，为您推荐最适合的RWA资产',
+    onboardingSubtitle: 'Claude AI分析您的投资偏好，帮助您按适配度和风险比较RWA资产',
     questionOf: (cur, total) => `第 ${cur} / ${total} 题`,
     percentDone: (pct) => `${pct}% 完成`,
     startAnalysis: '⚡ 开始AI分析 →',
@@ -339,12 +359,22 @@ export const T = {
     minInvestment: '最低投资',
     lockup: '锁仓期',
     lockupNone: '无',
-    expandBtn: '▼ 风险详情',
-    collapseBtn: '▲ 收起',
+    expandBtn: '风险详情',
+    collapseBtn: '收起',
     riskAnalysis: '风险分析',
     keyRisk: '核心风险',
     geniusAct: 'GENIUS法案影响',
     source: '官方来源',
+    topPick: 'AI精选',
+    ranked: '排名',
+    aiAnalyst: 'AI分析',
+    budgetBanner: (min) => `超出预算 — 最低投资额 ${min}`,
+    fitLabels: {
+      STRONG_MATCH: '高度匹配', GOOD_MATCH: '匹配',
+      REVIEW_CAREFULLY: '需审查', HIGH_MISMATCH: '较低匹配',
+      STRONG_BUY: '高度匹配', BUY: '匹配',
+      HOLD: '需审查', AVOID: '较低匹配',
+    },
 
     // ── Chat ─────────────────────────────────────────────────
     chatTitle: 'AI问答',

@@ -2,26 +2,15 @@ import { useState } from 'react';
 import { Icon, Spark } from './Icon.jsx';
 import { formatMinInvestment } from '../utils/riskScoring.js';
 
-const FIT_LABELS = {
-  STRONG_MATCH:     "Strong Match",
-  GOOD_MATCH:       "Good Match",
-  REVIEW_CAREFULLY: "Review",
-  HIGH_MISMATCH:    "Avoid",
-  STRONG_BUY:       "Strong Match",
-  BUY:              "Good Match",
-  HOLD:             "Review",
-  AVOID:            "Avoid",
-};
-
 const FIT_CHIP_CLASS = {
-  STRONG_MATCH:     "pos",
-  GOOD_MATCH:       "accent",
-  REVIEW_CAREFULLY: "warn",
-  HIGH_MISMATCH:    "neg",
-  STRONG_BUY:       "pos",
-  BUY:              "accent",
-  HOLD:             "warn",
-  AVOID:            "neg",
+  STRONG_MATCH:     'pos',
+  GOOD_MATCH:       'accent',
+  REVIEW_CAREFULLY: 'warn',
+  HIGH_MISMATCH:    'neg',
+  STRONG_BUY:       'pos',
+  BUY:              'accent',
+  HOLD:             'warn',
+  AVOID:            'neg',
 };
 
 export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, index, t }) {
@@ -37,14 +26,14 @@ export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, i
   const sparkValues = [5, 6, 5, 7, 6, 8, 7, 6, 7, 8].map(v => v + (5 - asset.riskScore) * 0.3);
 
   const fitKey       = analysis?.fitAssessment || analysis?.recommendation || 'REVIEW_CAREFULLY';
-  const fitLabel     = FIT_LABELS[fitKey]     || 'Review';
+  const fitLabel     = t.fitLabels?.[fitKey] ?? t.fitLabels?.REVIEW_CAREFULLY ?? 'Review';
   const fitChipClass = FIT_CHIP_CLASS[fitKey] || 'warn';
 
   return (
     <div className={`acard${isTopPick && !budgetExceeds ? ' top' : ''}${budgetExceeds ? ' budget-exceeded' : ''}`}>
       {budgetExceeds && (
         <div className="acard-budget-banner">
-          🚫 <span>{t.budgetExceeds} — {t.minInvestment} {formatMinInvestment(asset.minInvestment)}</span>
+          🚫 <span>{t.budgetBanner ? t.budgetBanner(formatMinInvestment(asset.minInvestment)) : `${t.budgetExceeds} — ${formatMinInvestment(asset.minInvestment)}`}</span>
         </div>
       )}
 
@@ -52,8 +41,8 @@ export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, i
         <div className="acard-rank">
           <span className="num">#{String(index + 1).padStart(2, '0')}</span>
           {isTopPick && !budgetExceeds
-            ? <><Icon name="star" size={11} /> AI TOP PICK</>
-            : <>RANKED</>
+            ? <><Icon name="star" size={11} /> {t.topPick}</>
+            : <>{t.ranked}</>
           }
         </div>
         <div className={`acard-risk ${riskCls}`}>
@@ -79,22 +68,22 @@ export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, i
 
         <div className="acard-metrics">
           <div className="acard-metric">
-            <div className="l">Expected APY</div>
+            <div className="l">{t.expectedApy}</div>
             <div className="v pos">{apyStr}</div>
           </div>
           <div className="acard-metric">
-            <div className="l">Min. Investment</div>
+            <div className="l">{t.minInvestment}</div>
             <div className="v">{formatMinInvestment(asset.minInvestment)}</div>
           </div>
           <div className="acard-metric">
-            <div className="l">Lockup</div>
-            <div className="v">{asset.lockupDays === 0 ? 'None' : `${asset.lockupDays}d`}</div>
+            <div className="l">{t.lockup}</div>
+            <div className="v">{asset.lockupDays === 0 ? t.lockupNone : `${asset.lockupDays}d`}</div>
           </div>
         </div>
 
         {analysis?.reasoning && (
           <div className="acard-note">
-            <span className="lbl">AI Analyst</span>
+            <span className="lbl">{t.aiAnalyst}</span>
             {analysis.reasoning}
           </div>
         )}
@@ -145,7 +134,7 @@ export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, i
               borderRadius: 'var(--r-sm)', fontSize: 12, color: 'var(--tx-2)',
             }}>
               <span style={{ color: 'var(--warn)', fontWeight: 600, display: 'block', marginBottom: 4 }}>
-                Key Risk
+                {t.keyRisk}
               </span>
               {analysis.keyRisk}
             </div>
@@ -159,7 +148,7 @@ export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, i
               borderRadius: 'var(--r-sm)', fontSize: 12, color: 'var(--tx-2)',
             }}>
               <span style={{ color: 'var(--ac-bright)', fontWeight: 600, display: 'block', marginBottom: 4 }}>
-                GENIUS Act
+                {t.geniusAct}
               </span>
               {analysis.geniusActImpact}
             </div>
@@ -175,7 +164,7 @@ export default function AssetCard({ asset, analysis, isTopPick, budgetExceeds, i
                 marginTop: 10, fontSize: 11, color: 'var(--tx-3)',
               }}
             >
-              🔗 {asset.source.label}
+              🔗 {t.source}
             </a>
           )}
         </div>

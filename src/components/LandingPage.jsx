@@ -43,7 +43,7 @@ function Chrome({ lang, setLang }) {
         </div>
       </div>
       <div className="chrome-right">
-        <span className="live-dot">Live · DeFiLlama</span>
+        <span className="live-dot">Est. · DeFiLlama</span>
         <div className="lang-switch">
           {LANGS.map(l => (
             <button

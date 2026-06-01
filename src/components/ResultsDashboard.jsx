@@ -125,7 +125,7 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
     const url = 'https://rwa-compass.vercel.app/';
     const text = t.shareText(topNames, url);
     if (navigator.share) {
-      try { await navigator.share({ title: 'RWA Compass', text }); return; } catch {}
+      try { await navigator.share({ title: 'RWA Compass', text }); return; } catch { /* user cancelled share */ }
     }
     await navigator.clipboard.writeText(text).catch(() => {});
     setCopied(true);

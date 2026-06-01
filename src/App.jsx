@@ -33,8 +33,8 @@ export default function App() {
         const live = marketData[a.id];
         return live ? { ...a, apy: { min: live.apy, max: live.apy } } : a;
       });
-      const filtered = filterAssetsByProfile(liveAssets, profile);
-      const assetsToAnalyze = filtered.length >= 2 ? filtered : liveAssets;
+      // Always send all assets to AI — budget/chain filtering is applied in ResultsDashboard display layer
+      const assetsToAnalyze = liveAssets;
       const result = await analyzeAssets(profile, assetsToAnalyze, API_KEY, lang);
       setAiResult(result);
       setStage('results');
