@@ -53,7 +53,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ background:'linear-gradient(135deg, #050d1a 0%, #070f1e 50%, #050d1a 100%)' }}>
-      {stage === 'landing'    && <LandingPage onStart={(selectedLang) => { setLang(selectedLang); setStage('onboarding'); }} />}
+      {stage === 'landing'    && <LandingPage onStart={(selectedLang) => { setLang(selectedLang); setStage('onboarding'); }} marketData={marketData} />}
       {stage === 'onboarding' && <OnboardingForm onComplete={handleProfileComplete} lang={lang} />}
       {stage === 'loading'    && <LoadingAnalysis lang={lang} />}
       {stage === 'results'    && (

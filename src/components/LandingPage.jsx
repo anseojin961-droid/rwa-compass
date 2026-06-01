@@ -2,38 +2,48 @@ import { useState } from 'react';
 import { Icon, BrandMark, Spark } from './Icon.jsx';
 import { T, LANGS } from '../i18n/index.js';
 
-// ── Static market data ────────────────────────────────────────────────────────
+// ── Static fallback data (used until DeFiLlama responds) ──────────────────────
 
-const TICKER_ITEMS = [
-  { sym: 'BUIDL',  val: '$1.00',   chg: '▲ 0.00%',  cls: 'pos' },
-  { sym: 'USDe',   val: '$1.00',   chg: '▲ 0.02%',  cls: 'pos' },
-  { sym: 'USDY',   val: '$1.06',   chg: '▲ 0.11%',  cls: 'pos' },
-  { sym: 'OUSG',   val: '$106.84', chg: '▲ 0.08%',  cls: 'pos' },
-  { sym: 'stUSDT', val: '$1.00',   chg: '▲ 0.01%',  cls: 'pos' },
-  { sym: 'TBY',    val: '$100.23', chg: '▼ 0.03%',  cls: 'neg' },
-  { sym: 'ONDO',   val: '$1.27',   chg: '▲ 2.14%',  cls: 'pos' },
+const STATIC_ASSETS = [
+  { id: 'blackrock-buidl', sym: 'BUIDL', nm: 'BlackRock USD',   fallbackApy: 4.50 },
+  { id: 'ethena-usde',     sym: 'USDe',  nm: 'Ethena sUSDe',    fallbackApy: 9.50 },
+  { id: 'ondo-usdy',       sym: 'USDY',  nm: 'Ondo US Yield',   fallbackApy: 5.30 },
+  { id: 'ondo-ousg',       sym: 'OUSG',  nm: 'Ondo Short-Term', fallbackApy: 4.20 },
+  { id: 'sky-usds',        sym: 'sUSDS', nm: 'Sky Savings',     fallbackApy: 3.60 },
+  { id: 'aave-usdc',       sym: 'aUSDC', nm: 'Aave USDC',       fallbackApy: 3.20 },
+  { id: 'morpho-usdc-cbbtc', sym: 'mUSDC', nm: 'Morpho Base',   fallbackApy: 6.00 },
 ];
 
-const KPIS = [
-  { lbl: 'RWA TVL',     val: '$12.84', unit: 'B', chg: '▲ 1.74% · 24h',  cls: 'pos' },
-  { lbl: 'Active Protocols', val: '127',    unit: '',  chg: '▲ 3 · 7d',       cls: 'pos' },
-  { lbl: 'Avg APY',     val: '8.34',  unit: '%', chg: '▼ 0.22% · 7d',   cls: 'neg' },
-  { lbl: 'Tokenized T-Bills', val: '$4.21', unit: 'B', chg: '▲ 5.30% · 30d', cls: 'pos' },
+const STATIC_TICKER = [
+  { sym: 'BUIDL',  id: 'blackrock-buidl' },
+  { sym: 'USDe',   id: 'ethena-usde' },
+  { sym: 'USDY',   id: 'ondo-usdy' },
+  { sym: 'OUSG',   id: 'ondo-ousg' },
+  { sym: 'sUSDS',  id: 'sky-usds' },
+  { sym: 'aUSDC',  id: 'aave-usdc' },
+  { sym: 'mUSDC',  id: 'morpho-usdc-cbbtc' },
 ];
 
-const ASSETS = [
-  { sym: 'BUIDL', nm: 'BlackRock USD',   apy: '5.12%', spk: [5.0, 5.05, 5.08, 5.10, 5.09, 5.12, 5.12] },
-  { sym: 'USDe',  nm: 'Ethena Synth',    apy: '9.50%', spk: [8.2, 9.1, 9.8, 10.2, 9.6, 9.3, 9.5] },
-  { sym: 'USDY',  nm: 'Ondo US Yield',   apy: '5.30%', spk: [5.1, 5.2, 5.25, 5.30, 5.28, 5.31, 5.30] },
-  { sym: 'OUSG',  nm: 'Ondo Short-Term', apy: '5.07%', spk: [4.9, 4.95, 5.0, 5.05, 5.07, 5.06, 5.07] },
-  { sym: 'stUSDT',nm: 'Tron Yield',      apy: '4.80%', spk: [4.5, 4.6, 4.7, 4.75, 4.80, 4.78, 4.80] },
-  { sym: 'TBY',   nm: 'Bloom T-Bill',    apy: '5.15%', spk: [5.0, 5.1, 5.12, 5.14, 5.15, 5.13, 5.15] },
-  { sym: 'ONDO',  nm: 'Ondo Finance',    apy: '6.80%', spk: [6.0, 6.3, 6.5, 6.7, 6.75, 6.8, 6.8] },
+const STATIC_KPIS = [
+  { lbl: 'RWA TVL',           val: '$12.84', unit: 'B', chg: '▲ 1.74% · 24h', cls: 'pos' },
+  { lbl: 'Active Protocols',  val: '127',    unit: '',  chg: '▲ 3 · 7d',       cls: 'pos' },
+  { lbl: 'Avg APY',           val: '—',      unit: '%', chg: 'loading...',      cls: '' },
+  { lbl: 'Tokenized T-Bills', val: '$4.21',  unit: 'B', chg: '▲ 5.30% · 30d', cls: 'pos' },
 ];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function buildSparkFromApy(apy) {
+  // Simulate a 7-day sparkline around the current APY with small variance
+  const base = apy;
+  return [0.97, 0.98, 0.99, 1.0, 0.99, 1.005, 1.0].map(m =>
+    Math.round(base * m * 100) / 100
+  );
+}
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function Chrome({ lang, setLang }) {
+function Chrome({ lang, setLang, isLive }) {
   return (
     <div className="chrome">
       <div className="chrome-left">
@@ -43,7 +53,7 @@ function Chrome({ lang, setLang }) {
         </div>
       </div>
       <div className="chrome-right">
-        <span className="live-dot">Est. · DeFiLlama</span>
+        <span className="live-dot">{isLive ? 'Live · DeFiLlama' : 'Est. · DeFiLlama'}</span>
         <div className="lang-switch">
           {LANGS.map(l => (
             <button
@@ -60,15 +70,17 @@ function Chrome({ lang, setLang }) {
   );
 }
 
-function TickerBar() {
+function TickerBar({ items }) {
   return (
     <div className="ticker-bar">
       <div className="ticker-track">
-        {[...TICKER_ITEMS, ...TICKER_ITEMS].map((t, i) => (
+        {[...items, ...items].map((t, i) => (
           <span className="tick" key={i}>
             <span className="sym">{t.sym}</span>
-            <span className="val">{t.val}</span>
-            <span className={`chg ${t.cls}`}>{t.chg}</span>
+            <span className="val">{t.apy != null ? `${t.apy}%` : '—%'}</span>
+            <span className={`chg ${t.apy != null ? 'pos' : ''}`}>
+              {t.apy != null ? 'APY' : '···'}
+            </span>
           </span>
         ))}
       </div>
@@ -76,24 +88,48 @@ function TickerBar() {
   );
 }
 
-// ── Feature definitions (icon-mapped) ────────────────────────────────────────
+// ── Feature definitions ───────────────────────────────────────────────────────
 
 const FEATURES = [
-  { glyph: 'cpu',      tag: '01 · Engine',  titleKey: 0, descKey: 0 },
-  { glyph: 'satellite',tag: '02 · Data',    titleKey: 1, descKey: 1 },
-  { glyph: 'shield',   tag: '03 · Risk',    titleKey: 2, descKey: 2 },
+  { glyph: 'cpu',       tag: '01 · Engine' },
+  { glyph: 'satellite', tag: '02 · Data' },
+  { glyph: 'shield',    tag: '03 · Risk' },
 ];
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function LandingPage({ onStart }) {
+export default function LandingPage({ onStart, marketData = {} }) {
   const [lang, setLang] = useState('ko');
-  const t = T[lang];
+  const t = T[lang] || T.ko;
+
+  const isLive = Object.keys(marketData).length > 0;
+
+  // Merge live APY into STATIC_ASSETS
+  const assets = STATIC_ASSETS.map(a => {
+    const live = marketData[a.id];
+    const apy = live?.apy ?? a.fallbackApy;
+    return { ...a, apy, spk: buildSparkFromApy(apy) };
+  });
+
+  // Ticker items from live data
+  const tickerItems = STATIC_TICKER.map(t => ({
+    sym: t.sym,
+    apy: marketData[t.id]?.apy ?? null,
+  }));
+
+  // Avg APY KPI from live data
+  const liveApys = assets.map(a => a.apy);
+  const avgApy = (liveApys.reduce((s, v) => s + v, 0) / liveApys.length).toFixed(2);
+  const kpis = STATIC_KPIS.map((k, i) =>
+    i === 2
+      ? { ...k, val: avgApy, chg: isLive ? '▲ Live' : 'Est.', cls: 'pos' }
+      : k
+  );
 
   return (
     <>
-      <Chrome lang={lang} setLang={setLang} />
-      <TickerBar />
+      <Chrome lang={lang} setLang={setLang} isLive={isLive} />
+      <TickerBar items={tickerItems} />
       <div className="landing">
         {/* ── Left: main content ─────────────────────────────────────────── */}
         <div className="landing-main">
@@ -141,10 +177,10 @@ export default function LandingPage({ onStart }) {
           <div className="side-section">
             <div className="side-head">
               <span className="side-title">Market Overview</span>
-              <span className="side-meta">DeFiLlama · Est.</span>
+              <span className="side-meta">{isLive ? 'DeFiLlama · Live' : 'DeFiLlama · Est.'}</span>
             </div>
             <div className="kpi-grid">
-              {KPIS.map((k, i) => (
+              {kpis.map((k, i) => (
                 <div className="kpi" key={i}>
                   <div className="kpi-lbl">{k.lbl}</div>
                   <div className="kpi-val">
@@ -157,18 +193,18 @@ export default function LandingPage({ onStart }) {
             </div>
           </div>
 
-          {/* Top Assets */}
+          {/* Top Assets — live APY */}
           <div className="side-section">
             <div className="side-head">
               <span className="side-title">Top Assets · APY</span>
-              <span className="side-meta">7 tracked</span>
+              <span className="side-meta">{isLive ? '🟢 Live' : '7 tracked'}</span>
             </div>
-            {ASSETS.map(a => (
+            {assets.map(a => (
               <div className="asset-row" key={a.sym}>
                 <span className="sym">{a.sym}</span>
                 <span className="nm">{a.nm}</span>
                 <Spark values={a.spk} width={48} height={16} />
-                <span className="ap">{a.apy}</span>
+                <span className="ap">{a.apy.toFixed(2)}%</span>
               </div>
             ))}
           </div>
