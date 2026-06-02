@@ -5,12 +5,10 @@ import ResultsDashboard from './components/ResultsDashboard.jsx';
 import LoadingAnalysis from './components/LoadingAnalysis.jsx';
 import { useClaudeAPI } from './hooks/useClaudeAPI.js';
 import { RWA_ASSETS } from './data/assets.js';
-import { fetchMarketData } from './utils/marketData.js';
+import { fetchMarketData, fetchRWAStats } from './utils/marketData.js';
 import { filterAssetsByProfile } from './utils/riskScoring.js';
 import { T } from './i18n/index.js';
 import './index.css';
-
-const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
 export default function App() {
   const [stage, setStage] = useState('landing');
@@ -19,10 +17,17 @@ export default function App() {
   const [aiResult, setAiResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [marketData, setMarketData] = useState({});
+  const [rwaStats, setRwaStats] = useState({});
   const { analyzeAssets } = useClaudeAPI();
 
   useEffect(() => {
-    fetchMarketData().then(setMarketData).catch(() => {});
+    Promise.all([
+      fetchMarketData().catch(() => ({})),
+      fetchRWAStats().catch(() => ({})),
+    ]).then(([md, stats]) => {
+      setMarketData(md);
+      setRwaStats(stats);
+    });
   }, []);
 
   async function handleProfileComplete(profile) {
@@ -33,9 +38,8 @@ export default function App() {
         const live = marketData[a.id];
         return live ? { ...a, apy: { min: live.apy, max: live.apy } } : a;
       });
-      // Always send all assets to AI — budget/chain filtering is applied in ResultsDashboard display layer
-      const assetsToAnalyze = liveAssets;
-      const result = await analyzeAssets(profile, assetsToAnalyze, API_KEY, lang);
+      const assetsToAnalyze = filterAssetsByProfile(liveAssets, profile);
+      const result = await analyzeAssets(profile, assetsToAnalyze, lang);
       setAiResult(result);
       setStage('results');
     } catch (err) {
@@ -53,11 +57,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ background:'linear-gradient(135deg, #050d1a 0%, #070f1e 50%, #050d1a 100%)' }}>
-      {stage === 'landing'    && <LandingPage onStart={(selectedLang) => { setLang(selectedLang); setStage('onboarding'); }} marketData={marketData} />}
+      {stage === 'landing'    && <LandingPage onStart={(selectedLang) => { setLang(selectedLang); setStage('onboarding'); }} marketData={marketData} rwaStats={rwaStats} />}
       {stage === 'onboarding' && <OnboardingForm onComplete={handleProfileComplete} lang={lang} />}
       {stage === 'loading'    && <LoadingAnalysis lang={lang} />}
       {stage === 'results'    && (
-        <ResultsDashboard profile={userProfile} aiResult={aiResult} apiKey={API_KEY} marketData={marketData} lang={lang} onReset={handleReset} />
+        <ResultsDashboard profile={userProfile} aiResult={aiResult} marketData={marketData} lang={lang} onReset={handleReset} />
       )}
       {stage === 'error' && (() => {
         const t = T[lang] || T.ko;

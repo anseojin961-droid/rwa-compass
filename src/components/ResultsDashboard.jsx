@@ -70,7 +70,7 @@ function RadarPanel({ assets, t }) {
   );
 }
 
-export default function ResultsDashboard({ profile, aiResult, apiKey, marketData = {}, lang = 'ko', onReset }) {
+export default function ResultsDashboard({ profile, aiResult, marketData = {}, lang = 'ko', onReset }) {
   const t = T[lang] || T.ko;
   const [copied, setCopied] = useState(false);
 
@@ -109,7 +109,7 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
     });
   }, [analyses, topPickIds, enrichedAssets, userBudget]);
 
-  const topAssets = sorted.filter(a => topPickIds.includes(a.id));
+  const topAssets = sorted.filter(a => topPickIds.includes(a.id) && !a._budgetExceeds);
 
   // Stat computations (for rep-stats block)
   const avgRisk = topAssets.length
@@ -278,7 +278,7 @@ export default function ResultsDashboard({ profile, aiResult, apiKey, marketData
               <span className="live-dot" style={{ fontSize: 10 }}>Claude</span>
             </div>
             <div className="panel-body" style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
-              <AIChat userProfile={profile} topAssets={topAssets} apiKey={apiKey} t={t} />
+              <AIChat userProfile={profile} topAssets={topAssets} lang={lang} t={t} />
             </div>
           </div>
         </div>
