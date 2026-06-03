@@ -15,7 +15,7 @@ export const T = {
     statsAI: 'Claude AI',        statsAISub: '실시간 분석 엔진',
     cta: 'AI 분석 시작하기',     ctaSub: '무료 · 3분 소요 · 가입 불필요',
     ctaPips: ['무료', '3분 소요', '가입 불필요'],
-    engineStatus: { title: '엔진 현황', engine: '분석 엔진', dataSource: '데이터 소스', assets: '분석 자산', serverSend: '서버 전송', none: '없음' },
+    engineStatus: { title: '엔진 현황', engine: '분석 엔진', dataSource: '데이터 소스', assets: '분석 자산', serverSend: '서버 전송', none: '분석 시 전송' },
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: '언어',
 
@@ -122,7 +122,7 @@ export const T = {
     dataStorage: '데이터 저장',
     localOnly: '로컬 전용',
     serverTransfer: '서버 전송',
-    noneValue: '없음',
+    noneValue: '분석 시 전송',
     whyTexts: [
       '투자 경험은 위험 허용도와 가장 강한 상관계수를 가집니다.',
       '투자 금액에 따라 최소 입금액 조건이 다른 자산이 필터링됩니다.',
@@ -158,7 +158,7 @@ export const T = {
     statsAI: 'Claude AI',         statsAISub: 'Real-time Analysis',
     cta: 'Start AI Analysis',     ctaSub: 'Free · 3 minutes · No sign-up',
     ctaPips: ['Free', '3 min', 'No sign-up'],
-    engineStatus: { title: 'Engine Status', engine: 'Analysis Engine', dataSource: 'Data Source', assets: 'Tracked Assets', serverSend: 'Server Transfer', none: 'None' },
+    engineStatus: { title: 'Engine Status', engine: 'Analysis Engine', dataSource: 'Data Source', assets: 'Tracked Assets', serverSend: 'Server Transfer', none: 'Sent on submit' },
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: 'Language',
 
@@ -265,7 +265,7 @@ export const T = {
     dataStorage: 'Data Storage',
     localOnly: 'Local only',
     serverTransfer: 'Server Transfer',
-    noneValue: 'None',
+    noneValue: 'Sent on submit',
     whyTexts: [
       'Experience level has the strongest correlation with risk tolerance.',
       'Assets whose minimum investment exceeds your budget are filtered out.',
@@ -301,7 +301,7 @@ export const T = {
     statsAI: 'Claude AI',       statsAISub: '实时分析引擎',
     cta: '开始AI分析',          ctaSub: '免费 · 3分钟 · 无需注册',
     ctaPips: ['免费', '3分钟', '无需注册'],
-    engineStatus: { title: '引擎状态', engine: '分析引擎', dataSource: '数据来源', assets: '追踪资产', serverSend: '服务器传输', none: '无' },
+    engineStatus: { title: '引擎状态', engine: '分析引擎', dataSource: '数据来源', assets: '追踪资产', serverSend: '服务器传输', none: '提交时发送' },
     powered: 'Powered by Claude AI & DeFiLlama',
     langLabel: '语言',
 
@@ -408,7 +408,7 @@ export const T = {
     dataStorage: '数据存储',
     localOnly: '仅本地',
     serverTransfer: '服务器传输',
-    noneValue: '无',
+    noneValue: '提交时发送',
     whyTexts: [
       '投资经验与风险承受能力具有最强相关性。',
       '最低投资额超出您预算的资产将被过滤排除。',

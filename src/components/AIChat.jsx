@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useClaudeAPI } from '../hooks/useClaudeAPI.js';
 
-export default function AIChat({ userProfile, topAssets, apiKey, t }) {
+export default function AIChat({ userProfile, topAssets, lang = 'ko', t }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ export default function AIChat({ userProfile, topAssets, apiKey, t }) {
     setMessages(next);
     setLoading(true);
     try {
-      const reply = await chat(next, userProfile, topAssets, apiKey);
+      const reply = await chat(next, userProfile, topAssets, lang);
       setMessages([...next, { role:'assistant', content:reply }]);
     } catch (e) {
       setMessages([...next, { role:'assistant', content:`${t?.chatError || 'Error'}: ${e.message}` }]);

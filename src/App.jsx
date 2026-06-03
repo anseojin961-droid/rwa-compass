@@ -38,7 +38,11 @@ export default function App() {
         const live = marketData[a.id];
         return live ? { ...a, apy: { min: live.apy, max: live.apy } } : a;
       });
-      const assetsToAnalyze = filterAssetsByProfile(liveAssets, profile);
+      const filtered = filterAssetsByProfile(liveAssets, profile);
+      // If strict filtering leaves fewer than 2 candidates, analyse all assets
+      // so the AI always has enough context; budget/chain mismatch is surfaced
+      // visually in the ResultsDashboard display layer instead.
+      const assetsToAnalyze = filtered.length >= 2 ? filtered : liveAssets;
       const result = await analyzeAssets(profile, assetsToAnalyze, lang);
       setAiResult(result);
       setStage('results');

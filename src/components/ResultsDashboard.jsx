@@ -213,6 +213,21 @@ export default function ResultsDashboard({ profile, aiResult, marketData = {}, l
             </div>
           )}
 
+          {topAssets.length === 0 && (
+            <div style={{
+              padding: '12px 16px', marginBottom: 16,
+              background: 'var(--warn-soft)',
+              border: '1px solid rgba(255,181,71,0.3)',
+              borderRadius: 'var(--r-sm)', fontSize: 13, color: 'var(--tx-2)',
+            }}>
+              ⚠️ {lang === 'ko'
+                ? 'AI 추천 자산이 현재 예산 조건에 맞지 않습니다. 아래 전체 목록에서 직접 비교해보세요.'
+                : lang === 'zh'
+                ? 'AI推荐资产与当前预算条件不符，请从下方完整列表中自行比较。'
+                : 'No AI top picks match your current budget. Compare all assets in the full list below.'}
+            </div>
+          )}
+
           <div className="rep-stats">
             <div className="rep-stat">
               <div className="l">{t.avgRisk}</div>

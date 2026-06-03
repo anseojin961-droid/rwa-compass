@@ -24,12 +24,12 @@ const STATIC_TICKER = [
   { sym: 'mUSDC',  id: 'morpho-usdc-cbbtc' },
 ];
 
-const STATIC_KPIS = [
-  { lbl: 'RWA TVL',           val: '$12.84', unit: 'B', chg: '▲ 1.74% · 24h', cls: 'pos' },
-  { lbl: 'Active Protocols',  val: '127',    unit: '',  chg: '▲ 3 · 7d',       cls: 'pos' },
-  { lbl: 'Avg APY',           val: '—',      unit: '%', chg: 'loading...',      cls: '' },
-  { lbl: 'Tokenized T-Bills', val: '$4.21',  unit: 'B', chg: '▲ 5.30% · 30d', cls: 'pos' },
-];
+function fmtB(n) {
+  if (!n || n <= 0) return '—';
+  if (n >= 1e9) return (n / 1e9).toFixed(2);
+  if (n >= 1e6) return (n / 1e6).toFixed(0) + 'M';
+  return '—';
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -98,11 +98,12 @@ const FEATURES = [
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function LandingPage({ onStart, marketData = {} }) {
+export default function LandingPage({ onStart, marketData = {}, rwaStats = {} }) {
   const [lang, setLang] = useState('ko');
   const t = T[lang] || T.ko;
 
   const isLive = Object.keys(marketData).length > 0;
+  const statsLive = rwaStats.totalTvl > 0;
 
   // Merge live APY into STATIC_ASSETS
   const assets = STATIC_ASSETS.map(a => {
@@ -117,14 +118,40 @@ export default function LandingPage({ onStart, marketData = {} }) {
     apy: marketData[t.id]?.apy ?? null,
   }));
 
-  // Avg APY KPI from live data
+  // KPIs — all live where possible
   const liveApys = assets.map(a => a.apy);
   const avgApy = (liveApys.reduce((s, v) => s + v, 0) / liveApys.length).toFixed(2);
-  const kpis = STATIC_KPIS.map((k, i) =>
-    i === 2
-      ? { ...k, val: avgApy, chg: isLive ? '▲ Live' : 'Est.', cls: 'pos' }
-      : k
-  );
+
+  const kpis = [
+    {
+      lbl: 'RWA TVL',
+      val: statsLive ? `$${fmtB(rwaStats.totalTvl)}` : '$—',
+      unit: statsLive ? 'B' : '',
+      chg: statsLive ? 'DeFiLlama · Live' : 'loading...',
+      cls: statsLive ? 'pos' : '',
+    },
+    {
+      lbl: 'Active Protocols',
+      val: statsLive ? String(rwaStats.activeProtocols) : '—',
+      unit: '',
+      chg: statsLive ? 'DeFiLlama · Live' : 'loading...',
+      cls: statsLive ? 'pos' : '',
+    },
+    {
+      lbl: 'Avg APY',
+      val: avgApy,
+      unit: '%',
+      chg: isLive ? 'DeFiLlama · Live' : 'Est.',
+      cls: 'pos',
+    },
+    {
+      lbl: 'Tokenized T-Bills',
+      val: isLive && marketData._tBillTvl > 0 ? `$${fmtB(marketData._tBillTvl)}` : '$—',
+      unit: isLive && marketData._tBillTvl > 0 ? 'B' : '',
+      chg: isLive ? 'DeFiLlama · Live' : 'loading...',
+      cls: isLive && marketData._tBillTvl > 0 ? 'pos' : '',
+    },
+  ];
 
   return (
     <>
